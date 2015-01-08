@@ -1,0 +1,281 @@
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <include
+        layout="@layout/layout_avd"
+        android:layout_width="fill_parent"
+        android:layout_height="fill_parent" />
+    -->
+
+    <EditText
+        android:id="@+id/editText_card_num"
+        android:layout_width="100dp"
+        android:layout_height="50dp"
+        android:background="@color/translate"
+        android:focusable="true"
+        android:singleLine="true"
+        android:textColor="@color/translate" />
+
+    <LinearLayout
+        android:id="@+id/relativeLayout_main"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="@drawable/bg_new"
+        android:orientation="vertical"
+        tools:context=".MainActivity">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="1"
+            android:background="@drawable/topstatebar_new"
+            android:orientation="horizontal">
+
+            <LinearLayout
+                android:layout_width="0dp"
+                android:layout_height="fill_parent"
+                android:layout_gravity="center"
+                android:layout_weight="1.5"
+                android:gravity="center_vertical"
+                android:orientation="horizontal">
+
+                <TextView
+                    android:id="@+id/textView_date"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="2"
+                    android:gravity="center_horizontal"
+                    android:text="时间"
+                    android:textAlignment="center"
+                    android:textAppearance="?android:attr/textAppearanceSmall"
+                    android:textColor="#ffffff" />
+
+                <TextView
+                    android:id="@+id/textView_time"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:gravity="center_horizontal"
+                    android:text="时间"
+                    android:textAlignment="center"
+                    android:textAppearance="?android:attr/textAppearanceSmall"
+                    android:textColor="#ffffff" />
+
+                <TextView
+                    android:id="@+id/textView_week"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:gravity="center_horizontal"
+                    android:text="时间"
+                    android:textAlignment="center"
+                    android:textAppearance="?android:attr/textAppearanceSmall"
+                    android:textColor="#ffffff" />
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="0dp"
+                android:layout_height="fill_parent"
+                android:layout_gravity="center"
+                android:layout_weight="2.1"
+                android:gravity="center_vertical"
+                android:orientation="horizontal">
+
+                <TextView
+                    android:id="@+id/textView1"
+                    android:layout_width="fill_parent"
+                    android:layout_height="wrap_content"
+                    android:gravity="center_horizontal"
+                    android:text="日常接送人"
+                    android:textAlignment="center"
+                    android:textAppearance="?android:attr/textAppearanceSmall"
+                    android:textColor="#ffffff" />
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="0dp"
+                android:layout_height="fill_parent"
+                android:layout_gravity="center"
+                android:layout_weight="1.3"
+                android:gravity="center_vertical"
+                android:orientation="horizontal">
+
+                <TextView
+                    android:layout_width="0dp"
+                    android:layout_weight="10"
+                    android:layout_height="wrap_content"
+                    android:gravity="center_horizontal"
+                    android:text="拍照区"
+                    android:textAlignment="center"
+                    android:textAppearance="?android:attr/textAppearanceSmall"
+                    android:textColor="#ffffff" />
+
+                <Button
+                    android:id="@+id/information"
+                    android:layout_width="30dp"
+                    android:layout_height="30dp"
+                    android:layout_marginRight="5dip"
+                    android:background="@drawable/information_button_selector"
+                    android:layout_alignParentRight="true"
+                    android:focusable="false"
+                    android:layout_centerVertical="true" />
+            </LinearLayout>
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="0.3"
+            android:orientation="horizontal">
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="5"
+            android:orientation="horizontal">
+
+            <LinearLayout
+                android:layout_width="0dp"
+                android:layout_height="fill_parent"
+                android:layout_weight="1.7"
+                android:gravity="center_vertical"
+                android:padding="10dp"
+                android:orientation="horizontal">
+
+                <include
+                    layout="@layout/layout_child_information" />
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="0dp"
+                android:layout_height="fill_parent"
+                android:layout_gravity="center"
+                android:layout_weight="2.5"
+                android:gravity="center_vertical"
+                android:orientation="horizontal"
+                android:weightSum="1">
+
+                <include
+                    layout="@layout/receiver_layout"
+                    android:layout_width="match_parent"
+                    android:layout_height="fill_parent"
+                    android:layout_weight="1" />
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="0dp"
+                android:layout_height="fill_parent"
+                android:layout_gravity="center"
+                android:layout_weight="1.5"
+                android:gravity="center_vertical"
+                android:orientation="horizontal">
+
+                <include
+                    layout="@layout/layout_right_bottom"
+                    android:layout_width="match_parent"
+                    android:layout_height="fill_parent"
+                    android:layout_weight="1" />
+            </LinearLayout>
+        </LinearLayout>
+
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="8"
+            android:orientation="horizontal">
+
+            <RelativeLayout
+                android:layout_width="0dp"
+                android:layout_height="fill_parent"
+                android:layout_weight="1.3">
+
+                <ImageView
+                    android:layout_width="80dp"
+                    android:layout_height="150dp"
+                    android:id="@+id/imageView_card_swipe"
+                    android:layout_alignParentLeft="true"
+                    android:layout_alignParentBottom="true"
+                    android:background="@drawable/swipe_card" />
+            </RelativeLayout>
+
+            <LinearLayout
+                android:id="@+id/linearLayout_health_check"
+                android:layout_width="0dp"
+                android:layout_height="fill_parent"
+                android:layout_weight="10"
+                android:orientation="vertical">
+
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="0dp"
+                    android:layout_weight="1"
+                    android:orientation="horizontal">
+
+                    <com.cytx.timecard.widget.HorizontalListView
+                        android:id="@+id/horizonListview_health_checks"
+                        android:layout_width="1018dp"
+                        android:layout_height="match_parent" />
+                </LinearLayout>
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="0dp"
+                    android:layout_weight="1"
+                    android:paddingLeft="0dp"
+                    android:orientation="horizontal"
+                    android:gravity="center_vertical">
+
+                    <com.cytx.timecard.widget.HorizontalListView
+                        android:id="@+id/horizonListview_reminders"
+                        android:layout_centerInParent="true"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent" />
+                </LinearLayout>
+            </LinearLayout>
+
+            <RelativeLayout
+                android:layout_width="0dp"
+                android:layout_height="fill_parent"
+                android:layout_weight="1.2" >
+
+                <ImageView
+                    android:layout_width="80dp"
+                    android:layout_height="150dp"
+                    android:id="@+id/imageView_confirm"
+                    android:layout_centerVertical="true"
+                    android:layout_alignParentRight="true"
+                    android:adjustViewBounds="false" />
+            </RelativeLayout>
+        </LinearLayout>
+    </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/linearLayout_loading"
+        android:layout_width="210dp"
+        android:layout_height="150dp"
+        android:layout_gravity="center"
+        android:background="#e0000000"
+        android:gravity="center_vertical">
+
+        <ProgressBar
+            android:id="@+id/progressBar_center"
+            style="?android:attr/progressBarStyleLarge"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content" />
+
+        <TextView
+            android:id="@+id/textView_loading"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/downloading"
+            android:textColor="@color/text_white"
+            android:textSize="20sp" />
+    </LinearLayout>
+
+
+</FrameLayout>

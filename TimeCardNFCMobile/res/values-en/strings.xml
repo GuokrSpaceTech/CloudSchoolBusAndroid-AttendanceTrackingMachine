@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <string name="app_name">Attendance Machine</string>
+    <string name="hello_world">Hello world!</string>
+    <string name="action_settings">Settings</string>
+    <string name="setting_dialog">Settings</string>
+    <string name="shutdowntime">Set switch time</string>
+     <string name="poweron">Power ON</string>
+     <string name="poweroff">Shut Down</string>
+     <string name="softwareupdate"> Software Update </string>
+    <string name="syncronizedata">Syncronize Data </string>
+    <string name="loading123">Loading......</string>
+</resources>

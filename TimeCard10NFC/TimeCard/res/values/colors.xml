@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <color name="text_title">#B3AB9D</color>
+    <color name="text_student_name">#211C14</color>
+    <color name="text_student_info">#695F4D</color>
+    <color name="text_blue">#0B6DFF</color>
+    <color name="text_red">#F45100</color>
+    <color name="text_white">#FFFFFF</color>
+    
+	<color name="result_view">#b0000000</color>
+	<color name="viewfinder_frame">#ff000000</color>
+	<color name="translate">#00000000</color>
+	<color name="viewfinder_laser">#ffff0000</color>
+	<color name="possible_result_points">#c0ffff00</color>
+	<color name="black">#000000</color>
+	
+
+	<color name="line">#cccccc</color>
+</resources>

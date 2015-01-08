@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content" >
+
+    <RelativeLayout
+        android:id="@+id/relativeLayout_student_info"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="10dp"
+        android:layout_marginTop="25dp"
+        android:layout_toRightOf="@+id/relativeLayout_portrait" >
+
+        <TextView
+            android:id="@+id/textView_student_name"
+            style="@style/style_student_name"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content" />
+
+        <TextView
+            android:id="@+id/textView_class"
+            style="@style/style_student_info"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/textView_student_name"
+            android:layout_marginBottom="5dp"
+            android:layout_marginTop="5dp" />
+
+        <TextView
+            android:id="@+id/textView_school"
+            style="@style/style_student_info"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/textView_class" />
+        
+        <TextView
+            android:id="@+id/textView_card"
+            style="@style/style_student_info"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:maxLines="2"
+            android:layout_below="@id/textView_school" />
+    </RelativeLayout>
+
+    <RelativeLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:background="@drawable/portrait_frame"
+        android:padding="5dp"
+        android:id="@+id/relativeLayout_portrait">
+
+        <ImageView
+            android:id="@+id/imageView_student_portrait"
+            android:layout_width="100dp"
+            android:layout_height="200dp"
+            android:scaleType="centerCrop"
+            android:src="@drawable/portrait_small"
+            android:layout_centerInParent="true" />
+
+        <ProgressBar
+            android:id="@+id/progressBar_student"
+            style="?android:attr/progressBarStyleLarge"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerInParent="true" />
+    </RelativeLayout>
+
+</RelativeLayout>

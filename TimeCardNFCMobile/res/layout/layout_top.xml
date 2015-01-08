@@ -1,0 +1,186 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:background="@drawable/umeng_update_title_bg"
+    android:id="@+id/relativeLayout_top" >
+
+	<RelativeLayout
+	     android:id="@+id/settings"
+	     android:layout_width="fill_parent"
+	     android:layout_height="30dp"
+	     android:layout_alignParentTop="true" >
+	
+	     <ImageView
+	         android:id="@+id/settingImgView"
+	         android:layout_width="fill_parent"
+	         android:layout_height="fill_parent"
+	         android:src="@drawable/umeng_update_button_ok_bg_selector" />
+	
+	     <TextView
+	         android:id="@+id/textViewSetting"
+	         android:layout_width="fill_parent"
+	         android:layout_height="fill_parent"
+	         android:background="#00000000"
+	         android:gravity="center"
+	         android:text="Settings(设置)"
+	         android:textColor="@color/black"
+	         android:textSize="18sp" />         
+	 </RelativeLayout>
+    
+    <RelativeLayout
+        android:id="@+id/relativeLayout_left_top_title"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/settings"
+        android:layout_centerHorizontal="true" >
+
+        <TextView
+            android:id="@+id/textView_date"
+            style="@style/style_text_title"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerVertical="true"
+            android:layout_marginLeft="20dp"
+            android:text="2014年8月1日" />
+
+        <TextView
+            android:id="@+id/textView_time"
+            style="@style/style_text_title"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerVertical="true"
+            android:layout_marginLeft="5dp"
+            android:layout_toRightOf="@id/textView_date"
+            android:text="10:11" />
+
+        <TextView
+            android:id="@+id/textView_week"
+            style="@style/style_text_title"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerVertical="true"
+            android:layout_marginLeft="5dp"
+            android:layout_toRightOf="@id/textView_time"
+            android:text="星期四" />
+
+        <TextView
+            android:id="@+id/textView_week_en"
+            style="@style/style_text_title"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerVertical="true"
+            android:layout_marginLeft="5dp"
+            android:layout_toRightOf="@id/textView_week"
+            android:text="Thursday" />
+    </RelativeLayout>
+
+	<RelativeLayout
+	    android:id="@+id/RLayout_student_portrait"
+	    android:layout_width="wrap_content"
+	    android:layout_height="wrap_content"
+	    android:layout_below="@id/relativeLayout_left_top_title" >
+
+		<ImageView
+		    android:layout_width="150dp"
+		    android:layout_height="150dp"
+		    android:layout_marginLeft="10dp"
+		    android:layout_marginTop="10dp"
+		    android:scaleType="fitXY"
+		    android:src="@drawable/portrait_big"
+		    android:id="@+id/imageView_student_portrait" />
+
+	        <ProgressBar
+	            android:id="@+id/progressBar_student"
+	            style="?android:attr/progressBarStyleLarge"
+	            android:layout_width="wrap_content"
+	            android:layout_height="wrap_content"
+	            android:layout_centerHorizontal="true"
+	            android:layout_centerVertical="true" />	    
+	</RelativeLayout>	
+    
+    <RelativeLayout
+        android:id="@+id/relativeLayout_studeng_info"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/relativeLayout_left_top_title"
+        android:layout_marginLeft="10dp"
+        android:layout_marginTop="10dp"
+        android:layout_toRightOf="@id/RLayout_student_portrait" >
+
+        <TextView
+            android:id="@+id/textView_student_name"
+            style="@style/style_student_name"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content" />
+
+        <TextView
+            android:id="@+id/textView_class"
+            style="@style/style_student_info"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/textView_student_name"
+            android:layout_marginBottom="5dp"
+            android:layout_marginTop="5dp" />
+
+        <TextView
+            android:id="@+id/textView_school"
+            style="@style/style_student_info"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/textView_class" />
+        
+        <TextView
+            android:id="@+id/textView_card"
+            style="@style/style_student_info"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/textView_school"
+            android:layout_marginTop="5dp" />
+    </RelativeLayout>
+    
+    
+    
+    <LinearLayout
+        android:id="@+id/linearLayout_left_bottom_title"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/RLayout_student_portrait"
+        android:background="@drawable/umeng_update_title_bg"
+        android:orientation="vertical" >
+
+        <TextView
+            android:id="@+id/textView1"
+            style="@style/style_left_bottom_title_first"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_horizontal" 
+            android:text="@string/left_bottom_title_1" />
+
+        <TextView
+            android:id="@+id/textView2"
+            style="@style/style_left_bottom_title_second"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_horizontal" 
+            android:text="@string/left_bottom_title_2" />
+<!--
+        <TextView
+            android:id="@+id/textView3"
+            style="@style/style_left_bottom_title_second"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_horizontal" 
+            android:text="@string/left_bottom_title_3" />
+-->
+    </LinearLayout>
+    <com.cytx.timecardmobile.widget.HorizontalListView
+        android:id="@+id/horizonListview"
+        android:layout_width="match_parent"
+        android:layout_height="200dp"
+        android:layout_below="@id/linearLayout_left_bottom_title"
+        android:layout_centerHorizontal="true"
+        android:layout_marginLeft="10dp"
+        android:layout_marginTop="10dp" />
+
+</RelativeLayout>
