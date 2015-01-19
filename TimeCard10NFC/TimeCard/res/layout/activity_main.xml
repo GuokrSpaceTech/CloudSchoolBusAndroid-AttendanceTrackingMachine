@@ -250,7 +250,7 @@
                     android:layout_centerVertical="true"
                     android:layout_alignParentRight="true"
                     android:adjustViewBounds="false"
-                    android:background="@drawable/confirm_white" />
+                    android:src="@drawable/confirm_white" />
             </RelativeLayout>
         </LinearLayout>
     </LinearLayout>

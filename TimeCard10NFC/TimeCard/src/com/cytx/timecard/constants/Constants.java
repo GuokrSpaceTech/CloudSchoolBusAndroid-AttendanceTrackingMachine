@@ -95,7 +95,8 @@ public class Constants {
 	public static final int MESSAGE_DISEASE_30 = 5;// 每30秒钟检查是否有上传疾病信息
 	public static final int MESSAGE_PUNCH_CARD = 6;// 开始上传打卡信息
 	public static final int MESSAGE_UPDATE_UI  = 7;
-	
+    public static final int MESSAGE_UPDATE_CONFIRM_BUTTON  = 8;
+
 	
 	public static final int NO_OPERATION_TIME = 60 * 1000;// 30秒无操作
 	public static final int CHECK_NETWORK_TIME = 30 * 1000;// 10秒钟检测一次网络

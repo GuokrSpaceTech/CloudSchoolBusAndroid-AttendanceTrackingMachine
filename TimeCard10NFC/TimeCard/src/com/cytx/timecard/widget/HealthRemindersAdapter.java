@@ -1,7 +1,8 @@
 package com.cytx.timecard.widget;
 
 import android.content.Context;
-import android.graphics.drawable.Drawable;
+
+import android.os.Handler;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -9,8 +10,7 @@ import android.widget.BaseAdapter;
 import android.widget.ImageView;
 import android.widget.TextView;
 
-import com.cytx.timecard.MainActivity;
-import com.cytx.timecard.R;
+import com.cytx.timecard.constants.Constants;
 import com.cytx.timecard.dto.HealthReminder;
 
 import java.util.List;
@@ -27,7 +27,8 @@ import static com.cytx.timecard.R.layout;
  */
 public class HealthRemindersAdapter extends BaseAdapter {
 
-	private Context context;
+    private final Handler handler;
+    private Context context;
 	private List<HealthReminder> reminderDtoList;
     private int     originalColor = drawable.confirm_white;
 
@@ -47,8 +48,9 @@ public class HealthRemindersAdapter extends BaseAdapter {
         this.reminderDtoList = reminderDtoList;
     }
 
-    public HealthRemindersAdapter(Context context, List<HealthReminder> list) {
+    public HealthRemindersAdapter(Context context, Handler handler, List<HealthReminder> list) {
 		this.context = context;
+        this.handler = handler;
 		this.reminderDtoList = list;
 	}
 
@@ -89,9 +91,6 @@ public class HealthRemindersAdapter extends BaseAdapter {
         viewHolder.imageView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                boolean hasSelection = false;
-
-                ImageView imageView = ((MainActivity) context).getConfirmImageView();
 
                 reminderDtoList.get(position).isSelected = !(reminderDtoList.get(position).isSelected);
 
@@ -100,51 +99,7 @@ public class HealthRemindersAdapter extends BaseAdapter {
                 else
                     view.setBackgroundResource(drawable.white_grey_border);
 
-                //if any of the item is selected, the confirm button turn to blue
-                for(int i=0; i<reminderDtoList.size(); i++)
-                {
-                    if(reminderDtoList.get(i).isSelected)
-                        hasSelection = true;
-                }
-
-                Object tag = imageView.getTag();
-                int id = tag == null ? -1 : Integer.parseInt(tag.toString());
-                //Selected Health Status
-                if(hasSelection) {
-                    switch (id)
-                    {
-                        case drawable.confirm_white:
-                        case drawable.confirm_blue:
-                            imageView.setBackgroundResource(drawable.confirm_red);
-                            imageView.setTag(drawable.confirm_red);
-                            break;
-                        case drawable.confirm_red:
-                        default:
-                            break;
-                    }
-                }
-                //No health Status
-                else
-                {
-                    switch (id)
-                    {
-                        case drawable.confirm_red:
-                            if( ((MainActivity)context).isHasReminders() ) {
-                                imageView.setBackgroundResource(drawable.confirm_blue);
-                                imageView.setTag(drawable.confirm_blue);
-                            }
-                            else
-                            {
-                                imageView.setBackgroundResource(drawable.confirm_white);
-                                imageView.setTag(drawable.confirm_white);
-                            }
-                            break;
-                        case drawable.confirm_blue:
-                        case drawable.confirm_white:
-                        default:
-                            break;
-                    }
-                }
+                handler.sendEmptyMessage(Constants.MESSAGE_UPDATE_CONFIRM_BUTTON);
             }
         });
 
@@ -154,7 +109,16 @@ public class HealthRemindersAdapter extends BaseAdapter {
 		return convertView;
 	}
 
-	public class ViewHolder {
+    public int getClickedNum() {
+        int count = 0;
+        for(HealthReminder item : reminderDtoList)
+        {
+            count += item.isSelected()?1:0;
+        }
+        return count;
+    }
+
+    public class ViewHolder {
 		public TextView reminder_desc;
         public ImageView imageView;
 	}

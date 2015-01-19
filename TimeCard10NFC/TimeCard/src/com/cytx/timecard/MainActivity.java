@@ -189,6 +189,7 @@ public class MainActivity extends Activity implements OnClickListener {
 
         //初始化view控件
         initViews();
+        mainHandler = new MainHandler();
         healthReminderList=loadHealthData();
         loadHealthRemiderUI();
         // 初始化各种listener监听事件
@@ -245,13 +246,11 @@ public class MainActivity extends Activity implements OnClickListener {
 
         //Confirm on reminders and health checks
         confirmImageView = (ImageView) findViewById(R.id.imageView_confirm);
-        confirmImageView.setTag(R.drawable.confirm_white);
 
         reminders_healthcheck_Layout = (LinearLayout) findViewById(R.id.linearLayout_health_check);
 
         //Health check
         horizontalListView_healthcheck = (HorizontalListView) findViewById(R.id.horizonListview_health_checks);
-
 
        // horizontalListView_healthcheck.setAdapter();
         //Normal Reminders
@@ -268,23 +267,6 @@ public class MainActivity extends Activity implements OnClickListener {
 
         // init Toast
         initOverlay();
-    }
-
-    //Getter and Setter
-    public ImageView getConfirmImageView() {
-        return confirmImageView;
-    }
-
-    public void setConfirmImageView(ImageView confirmImageView) {
-        this.confirmImageView = confirmImageView;
-    }
-
-    public boolean isHasReminders() {
-        return hasReminders;
-    }
-
-    public void setHasReminders(boolean hasReminders) {
-        this.hasReminders = hasReminders;
     }
 
     // 初始化提示框
@@ -413,7 +395,6 @@ public class MainActivity extends Activity implements OnClickListener {
     // 初始化数据
     private void initDatas() {
 
-        mainHandler = new MainHandler();
         toastThread = new ToastThread();
 
         // 检测30秒无操作
@@ -546,7 +527,7 @@ public class MainActivity extends Activity implements OnClickListener {
 
     protected void loadRemindersUI() {
         if (remindersAdapter == null) {
-            remindersAdapter = new RemindersAdapter(this, reminderList);
+            remindersAdapter = new RemindersAdapter(getApplicationContext(), mainHandler, reminderList);
             horizontalListView_reminders.setAdapter(remindersAdapter);
         } else {
             remindersAdapter.setReminderDtoList(reminderList);
@@ -590,7 +571,7 @@ public class MainActivity extends Activity implements OnClickListener {
     {
         if(healthCheckAdapter==null)
         {
-            healthCheckAdapter=new HealthRemindersAdapter(this,healthReminderList);
+            healthCheckAdapter=new HealthRemindersAdapter(getApplicationContext(), mainHandler, healthReminderList);
             horizontalListView_healthcheck.setAdapter(healthCheckAdapter);
         }
         else
@@ -1172,6 +1153,18 @@ public class MainActivity extends Activity implements OnClickListener {
                 case Constants.MESSAGE_UPDATE_UI:
                     loadRemindersUI();
                     break;
+                case Constants.MESSAGE_UPDATE_CONFIRM_BUTTON:
+                    int reminderClickedNum = remindersAdapter.getClickedNum();
+                    int healthReminderClickedNum = healthCheckAdapter.getClickedNum();
+                    if(healthReminderClickedNum>0)
+                    {
+                        confirmImageView.setImageResource(R.drawable.confirm_red);
+                    }
+                    else
+                    {
+                        confirmImageView.setImageResource(reminderClickedNum>0?R.drawable.confirm_blue:R.drawable.confirm_white);
+                    }
+                    break;
             }
         }
     }
@@ -1192,7 +1185,6 @@ public class MainActivity extends Activity implements OnClickListener {
             receiverAdapter.notifyDataSetChanged();
         }
 
-
         if(healthCheckAdapter!=null)
         {
             if(healthReminderList!=null)
@@ -1205,7 +1197,6 @@ public class MainActivity extends Activity implements OnClickListener {
                 healthCheckAdapter.setReminderDtoList(healthReminderList);
                 healthCheckAdapter.notifyDataSetChanged();
             }
-
         }
 
         if(remindersAdapter!=null)
@@ -1223,8 +1214,7 @@ public class MainActivity extends Activity implements OnClickListener {
             }
         }
 
-        confirmImageView.setBackgroundResource(R.drawable.confirm_white);
-        setHasReminders(false);
+        confirmImageView.setImageResource(R.drawable.confirm_white);
     }
 
     private void UploadAttState(AttendanceStateBean attState) {
@@ -1585,5 +1575,4 @@ public class MainActivity extends Activity implements OnClickListener {
 
         closeCamera();
     }
-
 }
