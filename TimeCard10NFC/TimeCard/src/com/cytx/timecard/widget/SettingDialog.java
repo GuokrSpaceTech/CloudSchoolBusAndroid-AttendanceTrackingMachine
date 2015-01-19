@@ -224,36 +224,7 @@ public class SettingDialog extends Dialog implements OnClickListener {
 							}
 							// code=1时，成功；否则失败
 							if ("1".equals(code)) {
-								
-								
-								
-//								String studentInfo = new String(arg2);
-//
-//								// 得到所有学生jiao'shi的信息							
-//								allStudentInfoDto = JsonHelp.getObject(studentInfo,
-//										AllStudentInfoDto.class);
-//
-//								if (allStudentInfoDto != null) {
-//									studentList = allStudentInfoDto.getStudent();
-//									studentMap = DataCacheTools.list2Map(studentList);
-//								    reminderList = allStudentInfoDto.getHealthstate();
-//									
-//									//Update the reminders
-//								  //  if(reminderList!=null && reminderList.size()!=0)
-//								       // updateReminders(reminderList);
-//									
-//								    // 将学生信息保存到本地								
-//									teacherList =allStudentInfoDto.getTeacher();
-//									teacherMap=DataCacheTools.list2tMap(teacherList);
-//
-//									// 将学生信息保存到本地
-//									FileTools.save2SDCard(
-//											Constants.STUDENT_INFO_DIR,
-//											Constants.STUDENT_INFO_FILE_NAME,
-//											studentInfo);
-								
-								
-								
+
 								String studentInfo = new String(arg2);
 								// 得到所有学生的信息
 								allStudentInfoDto = JsonHelp.getObject(studentInfo,

@@ -1,6 +1,7 @@
 package com.cytx.timecard.widget;
 
 import android.content.Context;
+import android.graphics.drawable.Drawable;
 import android.media.Image;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -8,6 +9,8 @@ import android.view.ViewGroup;
 import android.widget.BaseAdapter;
 import android.widget.ImageView;
 import android.widget.TextView;
+
+import com.cytx.timecard.MainActivity;
 import com.cytx.timecard.R;
 import com.cytx.timecard.dto.HealthStateDto;
 import com.cytx.timecard.dto.ReminderDto;
@@ -26,6 +29,7 @@ public class RemindersAdapter extends BaseAdapter {
 
 	private Context context;
 	private List<HealthStateDto> reminderDtoList;
+    private int     originalColor = drawable.confirm_white;
 
     public Context getContext() {
         return context;
@@ -84,12 +88,54 @@ public class RemindersAdapter extends BaseAdapter {
         viewHolder.imageView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+                boolean hasSelection = false;
+                ImageView imageView = ((MainActivity) context).getConfirmImageView();
                 reminderDtoList.get(position).isSelected = !(reminderDtoList.get(position).isSelected);
 
-                if(reminderDtoList.get(position).isSelected )
+                if(reminderDtoList.get(position).isSelected ) {
                     view.setBackgroundResource(R.drawable.gradient_blue);
+                }
                 else
-                    view.setBackgroundResource(drawable.white_grey_border);
+                    view.setBackgroundResource(R.drawable.white_grey_border);
+
+                //if any of the item is selected, the confirm button turn to blue
+                for(int i=0; i<reminderDtoList.size(); i++)
+                {
+                    if(reminderDtoList.get(i).isSelected)
+                        hasSelection = true;
+                }
+
+                Object tag = imageView.getTag();
+                int id = tag == null ? -1 : Integer.parseInt(tag.toString());
+                if(hasSelection) {
+                    switch (id)
+                    {
+                        case drawable.confirm_white:
+                            imageView.setBackgroundResource(R.drawable.confirm_blue);
+                            imageView.setTag(drawable.confirm_blue);
+                            break;
+                        case drawable.confirm_red:
+                        case drawable.confirm_blue:
+                        default:
+                            break;
+                    }
+                    ((MainActivity)context).setHasReminders(true);
+                }
+                else
+                {
+                    switch (id)
+                    {
+                        case drawable.confirm_blue:
+                            imageView.setBackgroundResource(drawable.confirm_white);
+                            imageView.setTag(drawable.confirm_white);
+                            break;
+                        case drawable.confirm_red:
+                        case drawable.confirm_white:
+                        default:
+                            break;
+                    }
+                    ((MainActivity)context).setHasReminders(false);
+                }
             }
         });
 
