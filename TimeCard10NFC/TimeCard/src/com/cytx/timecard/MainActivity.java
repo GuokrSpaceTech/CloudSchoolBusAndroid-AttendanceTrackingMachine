@@ -189,6 +189,7 @@ public class MainActivity extends Activity implements OnClickListener {
 
         //初始化view控件
         initViews();
+        mainHandler = new MainHandler();
         healthReminderList=loadHealthData();
         loadHealthRemiderUI();
         // 初始化各种listener监听事件
@@ -245,6 +246,7 @@ public class MainActivity extends Activity implements OnClickListener {
 
         //Confirm on reminders and health checks
         confirmImageView = (ImageView) findViewById(R.id.imageView_confirm);
+        confirmImageView.setImageResource(R.drawable.btn_confirm_white);
 
         reminders_healthcheck_Layout = (LinearLayout) findViewById(R.id.linearLayout_health_check);
 
@@ -395,7 +397,6 @@ public class MainActivity extends Activity implements OnClickListener {
     // 初始化数据
     private void initDatas() {
 
-        mainHandler = new MainHandler();
         toastThread = new ToastThread();
 
         // 检测30秒无操作
@@ -528,7 +529,7 @@ public class MainActivity extends Activity implements OnClickListener {
 
     protected void loadRemindersUI() {
         if (remindersAdapter == null) {
-            remindersAdapter = new RemindersAdapter(getApplicationContext(), reminderList);
+            remindersAdapter = new RemindersAdapter(getApplicationContext(), mainHandler, reminderList);
             horizontalListView_reminders.setAdapter(remindersAdapter);
         } else {
             remindersAdapter.setReminderDtoList(reminderList);
@@ -572,7 +573,7 @@ public class MainActivity extends Activity implements OnClickListener {
     {
         if(healthCheckAdapter==null)
         {
-            healthCheckAdapter=new HealthRemindersAdapter(getApplicationContext(),healthReminderList);
+            healthCheckAdapter=new HealthRemindersAdapter(getApplicationContext(), mainHandler, healthReminderList);
             horizontalListView_healthcheck.setAdapter(healthCheckAdapter);
         }
         else
@@ -1153,6 +1154,18 @@ public class MainActivity extends Activity implements OnClickListener {
                 // 手动同步结束
                 case Constants.MESSAGE_UPDATE_UI:
                     loadRemindersUI();
+                    break;
+                case Constants.MESSAGE_UPDATE_CONFIRM_BUTTON:
+                    int reminderClickedNum = remindersAdapter.getClickedNum();
+                    int healthReminderClickedNum = healthCheckAdapter.getClickedNum();
+                    if(healthReminderClickedNum>0)
+                    {
+                        confirmImageView.setImageResource(R.drawable.btn_confirm_red);
+                    }
+                    else
+                    {
+                        confirmImageView.setImageResource(reminderClickedNum>0?R.drawable.btn_confirm_blue:R.drawable.btn_confirm_white);
+                    }
                     break;
             }
         }

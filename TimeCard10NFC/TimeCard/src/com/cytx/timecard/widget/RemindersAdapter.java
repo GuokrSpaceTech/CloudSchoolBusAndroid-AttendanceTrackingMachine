@@ -2,6 +2,7 @@ package com.cytx.timecard.widget;
 
 import android.content.Context;
 import android.media.Image;
+import android.os.Handler;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -9,6 +10,7 @@ import android.widget.BaseAdapter;
 import android.widget.ImageView;
 import android.widget.TextView;
 import com.cytx.timecard.R;
+import com.cytx.timecard.constants.Constants;
 import com.cytx.timecard.dto.HealthStateDto;
 import com.cytx.timecard.dto.ReminderDto;
 
@@ -24,7 +26,8 @@ import static com.cytx.timecard.R.*;
  */
 public class RemindersAdapter extends BaseAdapter {
 
-	private Context context;
+    private final Handler handler;
+    private Context context;
 	private List<HealthStateDto> reminderDtoList;
 
     public Context getContext() {
@@ -43,8 +46,9 @@ public class RemindersAdapter extends BaseAdapter {
         this.reminderDtoList = reminderDtoList;
     }
 
-    public RemindersAdapter(Context context, List<HealthStateDto> list) {
+    public RemindersAdapter(Context context, Handler handler, List<HealthStateDto> list) {
 		this.context = context;
+        this.handler = handler;
 		this.reminderDtoList = list;
 	}
 
@@ -90,6 +94,8 @@ public class RemindersAdapter extends BaseAdapter {
                     view.setBackgroundResource(R.drawable.gradient_blue);
                 else
                     view.setBackgroundResource(drawable.white_grey_border);
+
+                handler.sendEmptyMessage(Constants.MESSAGE_UPDATE_CONFIRM_BUTTON);
             }
         });
 
@@ -99,7 +105,16 @@ public class RemindersAdapter extends BaseAdapter {
 		return convertView;
 	}
 
-	public class ViewHolder {
+    public int getClickedNum() {
+        int count = 0;
+        for(HealthStateDto item : reminderDtoList)
+        {
+            count += item.isSelected()?1:0;
+        }
+        return count;
+    }
+
+    public class ViewHolder {
 		public TextView reminder_desc;
         public ImageView imageView;
 	}
