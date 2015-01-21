@@ -16,6 +16,7 @@ import android.net.NetworkInfo;
 import android.net.wifi.WifiManager;
 import android.view.View;
 
+import com.cytx.timecard.TimeCardApplicatoin;
 import com.cytx.timecard.constants.Constants;
 
 /**
@@ -100,8 +101,15 @@ public class Utils {
 	public static String getMachineNum(Context context) {
 		WifiManager wm = (WifiManager) context.getSystemService(Context.WIFI_SERVICE);
 		String szWLANMAC = wm.getConnectionInfo().getMacAddress();
-		return szWLANMAC.replaceAll(":", "");
-	}
+        if(TimeCardApplicatoin.DEBUG_MODE_ON)
+        {
+            return "30e96523eb91"; // TODO: you can change it to a working mac for testing
+        }
+        else
+        {
+            return szWLANMAC == null ? "" : szWLANMAC.replaceAll(":", "");
+        }
+    }
 
 	/**
 	 * 清除打卡缓存数据:已上传

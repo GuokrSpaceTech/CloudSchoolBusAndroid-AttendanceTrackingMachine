@@ -9,14 +9,17 @@ import java.util.Map;
 
 import android.annotation.SuppressLint;
 import android.app.Service;
+import android.content.Context;
 import android.content.Intent;
 import android.os.Handler;
 import android.os.IBinder;
+import android.os.PowerManager;
 
 import com.cytx.timecard.bean.TimeCardBean;
 import com.cytx.timecard.constants.Constants;
 import com.cytx.timecard.service.impl.WebServiceImpl;
 import com.cytx.timecard.utility.DataCacheTools;
+import com.cytx.timecard.utility.DebugClass;
 import com.cytx.timecard.utility.JsonHelp;
 import com.cytx.timecard.utility.Utils;
 import com.loopj.android.http.AsyncHttpResponseHandler;
@@ -39,13 +42,15 @@ public class TimeCardService extends Service {
 	private final int TIME_NETWORK_EVERY = 10 * 1000;// 10秒钟检测网络状态
 	private final int TIME_PUNCH_CARD_EVERY = 10 * 1000;// 10秒上传一条打卡数据
 	private File currentFile;// 当前上传成功的文件
-	
+    private PowerManager.WakeLock wakeLock = null;
+
 	@SuppressLint("HandlerLeak")
 	private Handler handler = new Handler(){
 		public void handleMessage(android.os.Message msg) {
 			switch (msg.what) {
 			// 检测是否干掉已上传的打卡信息
 			case 1:
+                DebugClass.displayCurrentStack("delete those card info sent to server success");
 				if (count < TIME_12_H) {
 					count += 60 * 1000;
 					handler.sendEmptyMessageDelayed(1, TIME_CLEAR_EVERY);
@@ -54,7 +59,7 @@ public class TimeCardService extends Service {
 						// 清除数据
 						DataCacheTools.clearCacheDatas();
 					} catch (Exception e) {
-
+                        e.printStackTrace();
 					}
 					// 将计时器复原
 					count = 0;
@@ -74,18 +79,20 @@ public class TimeCardService extends Service {
 						// 文件夹为空
 						if (noUploadCardFile == null || noUploadCardFile.length == 0) {
 							// 继续检测
-							handler.sendEmptyMessageDelayed(2, TIME_NETWORK_EVERY);					
+							handler.sendEmptyMessageDelayed(2, TIME_NETWORK_EVERY);
+                            DebugClass.displayCurrentStack("empty path, monitor again");
 						}
 						// 文件夹不为空，开始上传
 						else {
+                            DebugClass.displayCurrentStack("NOT empty path, upload begin ...");
 							// flag默认为true，表示所有的文件都是以warn开头命名的
 							// flag为false，表示有的文件不是以warn开头命名的，那么上传此文件
 							boolean flag = true;
-							for (int i = 0; i < noUploadCardFile.length; i++) {
+                            for (File file :  noUploadCardFile) {
 								// 如果有文件不是以warn开头命名的，那么上传此文件
-								if (!noUploadCardFile[i].getName().startsWith("warn")) {
+                                if (!file.getName().startsWith("warn")) {
 									flag = false;
-									currentFile = noUploadCardFile[i];
+									currentFile = file;
 									break;
 								}
 							}
@@ -100,14 +107,17 @@ public class TimeCardService extends Service {
 							TimeCardBean timeCardBean = getTimeCardBean(cardData);
 							// 开始打卡信息
 							punchCard(timeCardBean);
+                            //TODO need to check why no more monitoing?
 						}
 					} else {
+                        DebugClass.displayCurrentStack("path not exist, monitor again");
 						// 若还没有未上传的文件，那么继续检测
 						handler.sendEmptyMessageDelayed(2, TIME_NETWORK_EVERY);
 					}
 				}
 				// 如果没有网络，那么隔继续检测
 				else {
+                    DebugClass.displayCurrentStack("network disconnected, monitor again");
 					handler.sendEmptyMessageDelayed(2, TIME_NETWORK_EVERY);
 				}
 				break;
@@ -124,6 +134,8 @@ public class TimeCardService extends Service {
 	@Override
 	public void onCreate() {
 		super.onCreate();
+        DebugClass.displayCurrentStack();
+        acquireWakeLock();
 		// 检测是否需要清除已上传打卡数据
 		handler.sendEmptyMessage(1);
 		// 检测有网时，就上传打卡信息
@@ -132,9 +144,18 @@ public class TimeCardService extends Service {
 
 	@Override
 	public int onStartCommand(Intent intent, int flags, int startId) {
+        DebugClass.displayCurrentStack();
 		return super.onStartCommand(intent, flags, startId);
 	}
-	
+
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+        DebugClass.displayCurrentStack();
+        releaseWakeLock();
+        this.startService(new Intent(this, TimeCardService.class));
+    }
+
 	/**
 	 * 以行为单位读取文件，常用于读面向行的格式化文件
 	 */
@@ -165,7 +186,7 @@ public class TimeCardService extends Service {
 	
 	/**
 	 * 获取TimeCardBean
-	 * @param jsonString
+	 * @param cardData
 	 * @return
 	 */
 	private TimeCardBean getTimeCardBean(String cardData){
@@ -235,4 +256,27 @@ public class TimeCardService extends Service {
 
  		currentFile.renameTo(new File(newFileDir, newFileName));
 	}
+
+    private void acquireWakeLock()
+    {
+        if (null == wakeLock)
+        {
+            PowerManager pm = (PowerManager)this.getSystemService(Context.POWER_SERVICE);
+            wakeLock = pm.newWakeLock(PowerManager.PARTIAL_WAKE_LOCK|PowerManager.ON_AFTER_RELEASE, "PostLocationService");
+            if (null != wakeLock)
+            {
+                wakeLock.acquire();
+            }
+        }
+    }
+
+    private void releaseWakeLock()
+    {
+        if (null != wakeLock)
+        {
+            wakeLock.release();
+            wakeLock = null;
+        }
+    }
+
 }

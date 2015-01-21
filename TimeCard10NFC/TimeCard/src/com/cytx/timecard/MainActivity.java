@@ -22,11 +22,11 @@ import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
+import android.os.Parcel;
 import android.os.Parcelable;
 import android.os.PowerManager;
 import android.text.Editable;
 import android.text.TextWatcher;
-import android.util.Log;
 import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
@@ -61,11 +61,11 @@ import com.cytx.timecard.dto.SmartCardInfoDto;
 import com.cytx.timecard.dto.StudentDto;
 import com.cytx.timecard.dto.TeacherDto;
 import com.cytx.timecard.jdbc.DataBaseUtils;
-import com.cytx.timecard.service.TimeCardService;
 import com.cytx.timecard.service.WebService;
 import com.cytx.timecard.service.impl.WebServiceImpl;
 import com.cytx.timecard.utility.DataCacheTools;
 import com.cytx.timecard.utility.DateTools;
+import com.cytx.timecard.utility.DebugClass;
 import com.cytx.timecard.utility.FileTools;
 import com.cytx.timecard.utility.JsonHelp;
 import com.cytx.timecard.utility.UIUtils;
@@ -437,6 +437,7 @@ public class MainActivity extends Activity implements OnClickListener {
                 UIUtils.showToast(this, "数据为空，请先联网下载数据!", "Data is null, please download data first!");
             }
 
+            //TODO saigon allStudentInfoDto has been initalized before,need to check if this is still needed
             allStudentInfoDto = JsonHelp.getObject(oldStudentInfo, AllStudentInfoDto.class);
             studentList = allStudentInfoDto.getStudent();
             studentMap = DataCacheTools.list2Map(studentList);
@@ -451,8 +452,8 @@ public class MainActivity extends Activity implements OnClickListener {
         // 下载广告图片
         downloadAvdPicture();
 
-        // 开启service服务
-        startService(new Intent(this, TimeCardService.class));
+        // 开启service服务, will be started in Receiver
+//        startService(new Intent(this, TimeCardService.class));
 
         sp = new SoundPool(5, AudioManager.STREAM_MUSIC, 0);
 
@@ -499,7 +500,7 @@ public class MainActivity extends Activity implements OnClickListener {
         // 学生班级：因为可能存在两个或多个班级
         List<ClassInfoDto> classInfoDtos = studentDto.getClassinfo();
         if (classInfoDtos != null && classInfoDtos.size() != 0) {
-            StringBuffer sBuffer = new StringBuffer();
+            StringBuilder sBuffer = new StringBuilder();
             for (int i = 0; i < classInfoDtos.size(); i++) {
                 sBuffer.append(classInfoDtos.get(i).getClassname()).append(",");
             }
@@ -701,8 +702,8 @@ public class MainActivity extends Activity implements OnClickListener {
                         Map<String, String> maps = new HashMap<String, String>();
                         if (arg1 != null && arg1.length != 0) {
 
-                            for (int i = 0; i < arg1.length; i++) {
-                                maps.put(arg1[i].getName(), arg1[i].getValue());
+                            for (Header head : arg1) {
+                                maps.put(head.getName(), head.getValue());
                             }
                         }
                         // 获取header中参数Code的值
@@ -794,8 +795,8 @@ public class MainActivity extends Activity implements OnClickListener {
                         Map<String, String> maps = new HashMap<String, String>();
 
                         if (arg1 != null && arg1.length != 0) {
-                            for (int i = 0; i < arg1.length; i++) {
-                                maps.put(arg1[i].getName(), arg1[i].getValue());
+                            for (Header head : arg1) {
+                                maps.put(head.getName(), head.getValue());
                             }
                         }
 
@@ -871,7 +872,7 @@ public class MainActivity extends Activity implements OnClickListener {
 
         if (cardNum != null && reminderList != null) {
             attStateBean = new AttendanceStateBean();
-            StringBuffer reminders = new StringBuffer();
+            StringBuilder reminders = new StringBuilder();
             for (int i = 0; i < reminderList.size(); i++) {
                 if (reminderList.get(i).isSelected) {
                     reminders.append(reminderList.get(i).getId()).append(",");
@@ -883,7 +884,7 @@ public class MainActivity extends Activity implements OnClickListener {
             attStateBean.setMid(Utils.getMachineNum(this));
             attStateBean.setCreatetime(System.currentTimeMillis() / 1000);
 
-            StringBuffer healthreminders = new StringBuffer();
+            StringBuilder healthreminders = new StringBuilder();
             for (int i = 0; i < healthReminderList.size(); i++) {
                 if (healthReminderList.get(i).isSelected) {
                     healthreminders.append(healthReminderList.get(i).getHealthString()).append(",");
@@ -953,7 +954,7 @@ public class MainActivity extends Activity implements OnClickListener {
 //		camera.stopPreview();// stop the preview
         if(null == camera)
         {
-            Log.e("MainActivity", "error: camera has been released when take picture!");
+            DebugClass.displayCurrentStack("error: camera has been released when take picture!");
             return;
         }
         playSound();
@@ -989,9 +990,7 @@ public class MainActivity extends Activity implements OnClickListener {
                 return null;
             }
             byte[] tmp = os.toByteArray();
-            Bitmap bmp = BitmapFactory.decodeByteArray(tmp, 0, tmp.length);
-
-            return bmp;
+            return BitmapFactory.decodeByteArray(tmp, 0, tmp.length);
         }
 
         @Override
@@ -1237,8 +1236,8 @@ public class MainActivity extends Activity implements OnClickListener {
             public void onSuccess(int arg0, Header[] arg1, byte[] arg2) {
                 Map<String, String> maps = new HashMap<String, String>();
                 if (arg1 != null && arg1.length != 0) {
-                    for (int i = 0; i < arg1.length; i++) {
-                        maps.put(arg1[i].getName(), arg1[i].getValue());
+                    for (Header head : arg1) {
+                        maps.put(head.getName(), head.getValue());
                     }
                 }
 
@@ -1289,8 +1288,8 @@ public class MainActivity extends Activity implements OnClickListener {
 
                 if (arg1 != null && arg1.length != 0) {
 
-                    for (int i = 0; i < arg1.length; i++) {
-                        maps.put(arg1[i].getName(), arg1[i].getValue());
+                    for (Header head : arg1) {
+                        maps.put(head.getName(), head.getValue());
                     }
                 }
 
@@ -1313,7 +1312,8 @@ public class MainActivity extends Activity implements OnClickListener {
         cancelTimeOperation();
 
         if (keyCode == KeyEvent.KEYCODE_BACK
-                && event.getAction() == KeyEvent.ACTION_DOWN) {
+                && event.getAction() == KeyEvent.ACTION_DOWN)
+        {
             if ((System.currentTimeMillis() - exitTime) > 800) {
                 UIUtils.showToastId(this, R.string.taost_press_again,
                         R.string.taost_press_again_en);
@@ -1331,6 +1331,26 @@ public class MainActivity extends Activity implements OnClickListener {
             }
             return true;
         }
+        else if(keyCode == KeyEvent.KEYCODE_HOME)
+        {
+            if(TimeCardApplicatoin.DEBUG_MODE_ON)            return true;
+        }
+//        just for test on devices without NFC function
+        else if(keyCode == KeyEvent.KEYCODE_MENU)
+        {
+            if(TimeCardApplicatoin.DEBUG_MODE_ON)
+            {
+                Intent intent = new Intent(this, getClass()).addFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP);
+                intent.setAction(NfcAdapter.ACTION_TAG_DISCOVERED);
+                Parcel cardId = Parcel.obtain();
+                cardId.writeString("76968361323171");
+                Tag tag = Tag.CREATOR.createFromParcel(cardId);
+                intent.putExtra(NfcAdapter.EXTRA_TAG, tag);
+                startActivity(intent);
+                return true;
+            }
+        }
+
         return super.onKeyDown(keyCode, event);
     }
 
@@ -1407,6 +1427,10 @@ public class MainActivity extends Activity implements OnClickListener {
             cardNum = getNFCTagId(tag);
 
          //   cardNum = "76968361323170";
+            if(TimeCardApplicatoin.DEBUG_MODE_ON)
+                cardNum = "8234568";
+            showTextViewToast("swipe card", "swipe card "+cardNum+"!");
+            DebugClass.displayCurrentStack("get card number: "+cardNum);
 
             cardTextView.setText("卡号：\n" + cardNum);
 
@@ -1501,9 +1525,9 @@ public class MainActivity extends Activity implements OnClickListener {
         if (isCameraRunning)
             return;
         else {
-            camera = Camera.open(Camera.CameraInfo.CAMERA_FACING_FRONT); // Turn on the camera
 
             try {
+                camera = Camera.open(Camera.CameraInfo.CAMERA_FACING_FRONT); // Turn on the camera
                 camera.setPreviewDisplay(surfaceHolder); // Set Preview
                 Camera.Parameters parameters = camera.getParameters(); // Camera
                 CameraInfo info = new CameraInfo();
@@ -1539,13 +1563,19 @@ public class MainActivity extends Activity implements OnClickListener {
                 //camera.setDisplayOrientation(180);
                 // parameters.setPreviewSize(400, 300); // Set Photo Size
                 camera.setParameters(parameters); // Setting camera parameters
+                isCameraRunning = true;
             } catch (IOException e) {
                 camera.stopPreview();
                 camera.release();// release camera
                 camera = null;
+                isCameraRunning = false;
             }
-
-            isCameraRunning = true;
+            catch (RuntimeException e)
+            {
+                camera = null;
+                e.printStackTrace();
+                isCameraRunning = false;
+            }
         }
     }
 
