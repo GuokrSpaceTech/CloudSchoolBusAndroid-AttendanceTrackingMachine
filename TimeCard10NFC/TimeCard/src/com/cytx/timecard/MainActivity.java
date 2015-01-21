@@ -26,6 +26,7 @@ import android.os.Parcelable;
 import android.os.PowerManager;
 import android.text.Editable;
 import android.text.TextWatcher;
+import android.util.Log;
 import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
@@ -246,6 +247,7 @@ public class MainActivity extends Activity implements OnClickListener {
 
         //Confirm on reminders and health checks
         confirmImageView = (ImageView) findViewById(R.id.imageView_confirm);
+        confirmImageView.setImageResource(R.drawable.confirm_white);
 
         reminders_healthcheck_Layout = (LinearLayout) findViewById(R.id.linearLayout_health_check);
 
@@ -949,6 +951,11 @@ public class MainActivity extends Activity implements OnClickListener {
     // 拍照
     private void takePic() {
 //		camera.stopPreview();// stop the preview
+        if(null == camera)
+        {
+            Log.e("MainActivity", "error: camera has been released when take picture!");
+            return;
+        }
         playSound();
         camera.setOneShotPreviewCallback(new PreviewCallback() {
 
