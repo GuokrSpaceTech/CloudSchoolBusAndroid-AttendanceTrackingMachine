@@ -253,7 +253,7 @@ public class SettingDialog extends Dialog implements OnClickListener {
 									
 									//activity.reminderList = allStudentInfoDto.getHealthstate();
 									
-									handler.sendEmptyMessage(Constants.MESSAGE_UPDATE_UI);
+									handler.sendEmptyMessage(Constants.MESSAGE_ID_UPDATE_UI);
 								}
 							}	
 							UIUtils.showToastGetStudentsInfoCode(code,context);
@@ -362,9 +362,9 @@ public class SettingDialog extends Dialog implements OnClickListener {
 
 	// 重新计时
 	private void cancelTimeOperation() {
-		handler.removeMessages(Constants.MESSAGE_30);
-		handler.sendEmptyMessageDelayed(Constants.MESSAGE_30,
-				Constants.NO_OPERATION_TIME);
+		handler.removeMessages(Constants.MESSAGE_ID_IDLE_DEVICE);
+		handler.sendEmptyMessageDelayed(Constants.MESSAGE_ID_IDLE_DEVICE,
+				Constants.TIME_NO_OPERATION);
 	}
 
 }

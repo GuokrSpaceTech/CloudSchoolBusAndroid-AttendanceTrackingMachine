@@ -400,13 +400,13 @@ public class MainActivity extends Activity implements OnClickListener {
         toastThread = new ToastThread();
 
         // 检测30秒无操作
-        mainHandler.sendEmptyMessageDelayed(Constants.MESSAGE_30, Constants.NO_OPERATION_TIME);
+        mainHandler.sendEmptyMessageDelayed(Constants.MESSAGE_ID_IDLE_DEVICE, Constants.TIME_NO_OPERATION);
 
         // 每10秒检测一次是否联网
-        mainHandler.sendEmptyMessage(Constants.MESSAGE_10);
+        mainHandler.sendEmptyMessage(Constants.MESSAGE_ID_CHECK_NETWORK);
 
         // 每10更新一次时间
-        mainHandler.sendEmptyMessage(Constants.MESSAGE_TIME_10);
+        mainHandler.sendEmptyMessage(Constants.MESSAGE_ID_UPDATE_TIME);
 
         // sharepreference存储首次进入程序的日期firstDate
         if ("".equals(TimeCardApplicatoin.getInstance().getStringFromShares(Constants.FIRST_DATE, ""))) {
@@ -772,8 +772,8 @@ public class MainActivity extends Activity implements OnClickListener {
                                           Throwable arg3) {
                         // 隔60秒更新一次心跳包
                         mainHandler.sendEmptyMessageDelayed(
-                                Constants.MESSAGE_HEART_60,
-                                Constants.CHECK_HEART_PACKAGE_TIME);
+                                Constants.MESSAGE_ID_HEART,
+                                Constants.TIME_CHECK_HEART_PACKAGE);
                         if (arg3 != null) {
                             UIUtils.showToastSererError(arg3,
                                     getApplicationContext());
@@ -787,8 +787,8 @@ public class MainActivity extends Activity implements OnClickListener {
                     public void onSuccess(int arg0, Header[] arg1, byte[] arg2) {
                         // 隔60秒更新一次心跳包
                         mainHandler.sendEmptyMessageDelayed(
-                                Constants.MESSAGE_HEART_60,
-                                Constants.CHECK_HEART_PACKAGE_TIME);
+                                Constants.MESSAGE_ID_HEART,
+                                Constants.TIME_CHECK_HEART_PACKAGE);
                         cancelTimeOperation();
                         loadingLinearLayout.setVisibility(View.GONE);
 
@@ -1029,7 +1029,7 @@ public class MainActivity extends Activity implements OnClickListener {
         currTimeCardBean.setFbody(base64);
 
         Message msg = mainHandler.obtainMessage();
-        msg.what = Constants.MESSAGE_PUNCH_CARD;
+        msg.what = Constants.MESSAGE_ID_GEN_CARD_INFO;
         msg.obj = currTimeCardBean;
 
         mainHandler.sendMessage(msg);
@@ -1076,7 +1076,7 @@ public class MainActivity extends Activity implements OnClickListener {
             super.handleMessage(msg);
             switch (msg.what) {
                 // 收到消息就跳转到广告界面
-                case Constants.MESSAGE_30:
+                case Constants.MESSAGE_ID_IDLE_DEVICE:
                     mainToAdvSwap();
                     // 清空UI界面
                     clearUI();
@@ -1091,7 +1091,7 @@ public class MainActivity extends Activity implements OnClickListener {
 
                     break;
                 // 每隔10秒检测一次是否联网
-                case Constants.MESSAGE_10:
+                case Constants.MESSAGE_ID_CHECK_NETWORK:
                     // 如果没联网则提示
                     if (!Utils.checkNetworkInfo(MainActivity.this)) {
                         UIUtils.showToastId(MainActivity.this,
@@ -1099,12 +1099,12 @@ public class MainActivity extends Activity implements OnClickListener {
                                 R.string.taost_check_network_en);
                     }
                     // 轮询检测
-                    sendEmptyMessageDelayed(Constants.MESSAGE_10,
-                            Constants.CHECK_NETWORK_TIME);
+                    sendEmptyMessageDelayed(Constants.MESSAGE_ID_CHECK_NETWORK,
+                            Constants.TIME_CHECK_NETWORK);
 
                     break;
                 // 10秒更新一次时间
-                case Constants.MESSAGE_TIME_10:
+                case Constants.MESSAGE_ID_UPDATE_TIME:
                     // 年月日，时间，星期（中英文）
                     String date = DateTools.getDateForm("yyyy年MM月dd日",
                             System.currentTimeMillis());
@@ -1118,26 +1118,26 @@ public class MainActivity extends Activity implements OnClickListener {
                     dateTextView.setText(date);
                     timeTextView.setText(time);
                     weekTextView.setText(week);
-                    sendEmptyMessageDelayed(Constants.MESSAGE_TIME_10, Constants.UPDATE_TIME);
+                    sendEmptyMessageDelayed(Constants.MESSAGE_ID_UPDATE_TIME, Constants.TIME_UPDATE_TIME);
                     break;
                 // 每30分钟更新一个心跳包
-                case Constants.MESSAGE_HEART_60:
+                case Constants.MESSAGE_ID_HEART:
 
                     getStudentCheck();
 
                     break;
                 // 打卡之后后，等30秒再和健康状态信息一起上传
-                case Constants.MESSAGE_DISEASE_30:
+                case Constants.MESSAGE_ID_UPLOAD_DISEASE:
                     if (timing < 30) {
                         timing++;
-                        sendEmptyMessageDelayed(Constants.MESSAGE_DISEASE_30, 1000);
+                        sendEmptyMessageDelayed(Constants.MESSAGE_ID_UPLOAD_DISEASE, 1000);
                     } else {
-                        mainHandler.sendEmptyMessage(Constants.MESSAGE_PUNCH_CARD);
+                        mainHandler.sendEmptyMessage(Constants.MESSAGE_ID_GEN_CARD_INFO);
                     }
 
                     break;
                 // 开始上传打卡信息
-                case Constants.MESSAGE_PUNCH_CARD:
+                case Constants.MESSAGE_ID_GEN_CARD_INFO:
                     timing = 0;
 
                     TimeCardBean tmcardBean = (TimeCardBean) msg.obj;
@@ -1156,10 +1156,10 @@ public class MainActivity extends Activity implements OnClickListener {
 
                     break;
                 // 手动同步结束
-                case Constants.MESSAGE_UPDATE_UI:
+                case Constants.MESSAGE_ID_UPDATE_UI:
                     loadRemindersUI();
                     break;
-                case Constants.MESSAGE_UPDATE_CONFIRM_BUTTON:
+                case Constants.MESSAGE_ID_UPDATE_CONFIRM_BUTTON:
                     int reminderClickedNum = remindersAdapter.getClickedNum();
                     int healthReminderClickedNum = healthCheckAdapter.getClickedNum();
                     if(healthReminderClickedNum>0)
@@ -1264,7 +1264,7 @@ public class MainActivity extends Activity implements OnClickListener {
             @Override
             public void onStart() {
                 super.onStart();
-                mainHandler.removeMessages(Constants.MESSAGE_30);
+                mainHandler.removeMessages(Constants.MESSAGE_ID_IDLE_DEVICE);
             }
 
             @Override
@@ -1320,12 +1320,12 @@ public class MainActivity extends Activity implements OnClickListener {
                 exitTime = System.currentTimeMillis();
             } else {
                 if (mainHandler != null) {
-                    mainHandler.removeMessages(Constants.MESSAGE_30);
-                    mainHandler.removeMessages(Constants.MESSAGE_10);
-                    mainHandler.removeMessages(Constants.MESSAGE_TIME_10);
-                    mainHandler.removeMessages(Constants.MESSAGE_HEART_60);
-                    mainHandler.removeMessages(Constants.MESSAGE_DISEASE_30);
-                    mainHandler.removeMessages(Constants.MESSAGE_PUNCH_CARD);
+                    mainHandler.removeMessages(Constants.MESSAGE_ID_IDLE_DEVICE);
+                    mainHandler.removeMessages(Constants.MESSAGE_ID_CHECK_NETWORK);
+                    mainHandler.removeMessages(Constants.MESSAGE_ID_UPDATE_TIME);
+                    mainHandler.removeMessages(Constants.MESSAGE_ID_HEART);
+                    mainHandler.removeMessages(Constants.MESSAGE_ID_UPLOAD_DISEASE);
+                    mainHandler.removeMessages(Constants.MESSAGE_ID_GEN_CARD_INFO);
                 }
                 finish();
             }
@@ -1333,12 +1333,12 @@ public class MainActivity extends Activity implements OnClickListener {
         }
         else if(keyCode == KeyEvent.KEYCODE_HOME)
         {
-            if(TimeCardApplicatoin.DEBUG_MODE_ON)            return true;
+            if(Constants.DEBUG_MODE_ON)            return true;
         }
 //        just for test on devices without NFC function
         else if(keyCode == KeyEvent.KEYCODE_MENU)
         {
-            if(TimeCardApplicatoin.DEBUG_MODE_ON)
+            if(Constants.DEBUG_MODE_ON)
             {
                 Intent intent = new Intent(this, getClass()).addFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP);
                 intent.setAction(NfcAdapter.ACTION_TAG_DISCOVERED);
@@ -1407,9 +1407,9 @@ public class MainActivity extends Activity implements OnClickListener {
     // 重新计时
     private void cancelTimeOperation() {
         advToMainSwap();
-        mainHandler.removeMessages(Constants.MESSAGE_30);
-        mainHandler.sendEmptyMessageDelayed(Constants.MESSAGE_30,
-                Constants.NO_OPERATION_TIME);
+        mainHandler.removeMessages(Constants.MESSAGE_ID_IDLE_DEVICE);
+        mainHandler.sendEmptyMessageDelayed(Constants.MESSAGE_ID_IDLE_DEVICE,
+                Constants.TIME_NO_OPERATION);
     }
 
     private void resolveIntent(Intent intent) {
@@ -1427,7 +1427,7 @@ public class MainActivity extends Activity implements OnClickListener {
             cardNum = getNFCTagId(tag);
 
          //   cardNum = "76968361323170";
-            if(TimeCardApplicatoin.DEBUG_MODE_ON)
+            if(Constants.DEBUG_MODE_ON)
                 cardNum = "8234568";
             showTextViewToast("swipe card", "swipe card "+cardNum+"!");
             DebugClass.displayCurrentStack("get card number: "+cardNum);

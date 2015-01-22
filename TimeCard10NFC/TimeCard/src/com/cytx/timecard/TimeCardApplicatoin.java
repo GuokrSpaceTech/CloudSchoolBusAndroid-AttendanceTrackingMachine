@@ -25,7 +25,6 @@ import com.nostra13.universalimageloader.core.assist.ImageScaleType;
 public class TimeCardApplicatoin extends Application {
 
 	private static TimeCardApplicatoin app;
-    public static final boolean DEBUG_MODE_ON = true;
     //	private SQLiteDatabase db;
 //	private DatabaseHelper databaseHelper;
 

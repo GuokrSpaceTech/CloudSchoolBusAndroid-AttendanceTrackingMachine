@@ -1,8 +1,6 @@
 package com.cytx.timecard.widget;
 
 import android.content.Context;
-import android.graphics.drawable.Drawable;
-import android.media.Image;
 import android.os.Handler;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -11,11 +9,9 @@ import android.widget.BaseAdapter;
 import android.widget.ImageView;
 import android.widget.TextView;
 
-import com.cytx.timecard.MainActivity;
 import com.cytx.timecard.R;
 import com.cytx.timecard.constants.Constants;
 import com.cytx.timecard.dto.HealthStateDto;
-import com.cytx.timecard.dto.ReminderDto;
 
 import java.util.List;
 
@@ -100,7 +96,7 @@ public class RemindersAdapter extends BaseAdapter {
                 else
                     view.setBackgroundResource(R.drawable.white_grey_border);
 
-                handler.sendEmptyMessage(Constants.MESSAGE_UPDATE_CONFIRM_BUTTON);
+                handler.sendEmptyMessage(Constants.MESSAGE_ID_UPDATE_CONFIRM_BUTTON);
             }
         });
 

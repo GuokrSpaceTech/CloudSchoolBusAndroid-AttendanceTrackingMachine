@@ -99,7 +99,7 @@ public class HealthRemindersAdapter extends BaseAdapter {
                 else
                     view.setBackgroundResource(drawable.white_grey_border);
 
-                handler.sendEmptyMessage(Constants.MESSAGE_UPDATE_CONFIRM_BUTTON);
+                handler.sendEmptyMessage(Constants.MESSAGE_ID_UPDATE_CONFIRM_BUTTON);
             }
         });
 

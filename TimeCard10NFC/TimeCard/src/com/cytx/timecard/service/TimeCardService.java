@@ -15,6 +15,7 @@ import android.os.Handler;
 import android.os.IBinder;
 import android.os.PowerManager;
 
+import com.cytx.timecard.MainActivity;
 import com.cytx.timecard.bean.TimeCardBean;
 import com.cytx.timecard.constants.Constants;
 import com.cytx.timecard.service.impl.WebServiceImpl;
@@ -49,7 +50,7 @@ public class TimeCardService extends Service {
 		public void handleMessage(android.os.Message msg) {
 			switch (msg.what) {
 			// 检测是否干掉已上传的打卡信息
-			case 1:
+			case Constants.MESSAGE_ID_CLEAN_OLD_CARD_INFO:
                 DebugClass.displayCurrentStack("delete those card info sent to server success");
 				if (count < TIME_12_H) {
 					count += 60 * 1000;
@@ -69,7 +70,7 @@ public class TimeCardService extends Service {
 				break;
 
 			// 检测在有网络的情况下，上传打卡数据
-			case 2:
+			case Constants.MESSAGE_ID_UPLOAD_CARD_INFO:
 				// 如果有网络，那么上传打卡信息
 				if (Utils.checkNetworkInfo(TimeCardService.this)) {
 					File fileDir = new File(Constants.CARD_INFO_DIR_NO);
@@ -135,11 +136,13 @@ public class TimeCardService extends Service {
 	public void onCreate() {
 		super.onCreate();
         DebugClass.displayCurrentStack();
-        acquireWakeLock();
+//        acquireWakeLock();
 		// 检测是否需要清除已上传打卡数据
-		handler.sendEmptyMessage(1);
+		handler.sendEmptyMessage(Constants.MESSAGE_ID_CLEAN_OLD_CARD_INFO);
 		// 检测有网时，就上传打卡信息
-		handler.sendEmptyMessage(2);
+		handler.sendEmptyMessage(Constants.MESSAGE_ID_UPLOAD_CARD_INFO);
+
+        startActivity(new Intent(this, MainActivity.class));
 	}
 
 	@Override
@@ -152,8 +155,8 @@ public class TimeCardService extends Service {
     public void onDestroy() {
         super.onDestroy();
         DebugClass.displayCurrentStack();
-        releaseWakeLock();
-        this.startService(new Intent(this, TimeCardService.class));
+//        releaseWakeLock();
+//        this.startService(new Intent(this, TimeCardService.class));
     }
 
 	/**
