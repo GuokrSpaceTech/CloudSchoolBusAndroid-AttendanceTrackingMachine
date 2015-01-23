@@ -12,18 +12,15 @@ import com.cytx.timecard.utility.DebugClass;
 
 public class BootBroadcastReceiver extends BroadcastReceiver
 {
-    private String other;
 
     @Override
-    public void onReceive(Context arg0, Intent arg1)
+    public void onReceive(Context context, Intent intent)
     {
         DebugClass.displayCurrentStack("Boot Complete, service will be started");
-        if (arg1.getAction().equals(other))
+        if (intent.getAction().equals("android.intent.action.BOOT_COMPLETED"))
         {
-            Intent myintent = new Intent(arg0, TimeCardService.class);
-            // TODO modified if any parameters needed to be passed to the service
-            //myintent.setAction("org.allin.android.musicService");
-            arg0.startService(myintent);
+            Intent myintent = new Intent(context, TimeCardService.class);
+            context.startService(myintent);
         }
     }
 }
