@@ -61,6 +61,7 @@ import com.cytx.timecard.dto.SmartCardInfoDto;
 import com.cytx.timecard.dto.StudentDto;
 import com.cytx.timecard.dto.TeacherDto;
 import com.cytx.timecard.jdbc.DataBaseUtils;
+import com.cytx.timecard.service.TimeCardService;
 import com.cytx.timecard.service.WebService;
 import com.cytx.timecard.service.impl.WebServiceImpl;
 import com.cytx.timecard.utility.DataCacheTools;
@@ -193,6 +194,22 @@ public class MainActivity extends Activity implements OnClickListener {
         mainHandler = new MainHandler();
         healthReminderList=loadHealthData();
         loadHealthRemiderUI();
+
+        if(!Constants.INTENT_START_ACTIVITY_ONLY.equals(getIntent().getAction()))
+        {
+            DebugClass.displayCurrentStack("Activity launched from home, start service ...");
+            // 开启service服务, will be started in Receiver
+            Intent intent = new Intent(this, TimeCardService.class);
+            intent.setAction(Constants.INTENT_START_SERVICE_ONLY);
+            startService(intent);
+        }
+
+
+        else
+        {
+            DebugClass.displayCurrentStack("Activity launched from service, NOT start service ...");
+        }
+
         // 初始化各种listener监听事件
         initListeners();
         // 初始化数据
@@ -451,9 +468,6 @@ public class MainActivity extends Activity implements OnClickListener {
 
         // 下载广告图片
         downloadAvdPicture();
-
-        // 开启service服务, will be started in Receiver
-//        startService(new Intent(this, TimeCardService.class));
 
         sp = new SoundPool(5, AudioManager.STREAM_MUSIC, 0);
 

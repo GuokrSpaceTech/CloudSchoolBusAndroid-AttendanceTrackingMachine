@@ -7,6 +7,7 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 
+import com.cytx.timecard.constants.Constants;
 import com.cytx.timecard.service.TimeCardService;
 import com.cytx.timecard.utility.DebugClass;
 
@@ -20,6 +21,7 @@ public class BootBroadcastReceiver extends BroadcastReceiver
         if (intent.getAction().equals("android.intent.action.BOOT_COMPLETED"))
         {
             Intent myintent = new Intent(context, TimeCardService.class);
+            myintent.setAction(Constants.INTENT_START_SERVICE_ACTIVITY);
             context.startService(myintent);
         }
     }

@@ -141,13 +141,22 @@ public class TimeCardService extends Service {
 		handler.sendEmptyMessage(Constants.MESSAGE_ID_CLEAN_OLD_CARD_INFO);
 		// 检测有网时，就上传打卡信息
 		handler.sendEmptyMessage(Constants.MESSAGE_ID_UPLOAD_CARD_INFO);
-
-        startActivity(new Intent(this, MainActivity.class));
 	}
 
 	@Override
 	public int onStartCommand(Intent intent, int flags, int startId) {
         DebugClass.displayCurrentStack();
+        if(Constants.INTENT_START_SERVICE_ACTIVITY.equals( intent.getAction()))
+        {
+            DebugClass.displayCurrentStack("Service started from receiver, start Activity ...");
+            Intent sctivityIntent = new Intent(this, MainActivity.class);
+            sctivityIntent.setAction(Constants.INTENT_START_ACTIVITY_ONLY);
+            startActivity(sctivityIntent);
+        }
+        else
+        {
+            DebugClass.displayCurrentStack("Service started from MainActivity, NOT start Activity ...");
+        }
 		return super.onStartCommand(intent, flags, startId);
 	}
 

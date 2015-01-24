@@ -12,6 +12,9 @@ import com.cytx.timecard.utility.FileTools;
  */
 public class Constants {
 
+    public static final String INTENT_START_SERVICE_ONLY = "com.cytx.timecard.startserviceonly";
+    public static final String INTENT_START_SERVICE_ACTIVITY = "com.cytx.timecard.startserviceactivity";
+    public static final String INTENT_START_ACTIVITY_ONLY = "com.cytx.timecard.startactivityonly";
     // 是否需要版本更新
 	public static boolean IS_NEED_UPDATE = false;
 	//=====================数据缓存=================//
