@@ -101,7 +101,7 @@ public class Constants {
     public static final int MESSAGE_ID_CLEAN_OLD_CARD_INFO = 9;
     public static final int MESSAGE_ID_UPLOAD_CARD_INFO = 10;
 
-    public static final boolean DEBUG_MODE_ON = true;
+    public static final boolean DEBUG_MODE_ON = false;
 
 
 	public static final int TIME_NO_OPERATION = 60 * 1000;// 30秒无操作

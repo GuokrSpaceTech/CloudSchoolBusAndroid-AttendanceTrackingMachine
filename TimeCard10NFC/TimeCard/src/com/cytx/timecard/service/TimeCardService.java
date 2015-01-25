@@ -54,7 +54,7 @@ public class TimeCardService extends Service {
                 DebugClass.displayCurrentStack("delete those card info sent to server success");
 				if (count < TIME_12_H) {
 					count += 60 * 1000;
-					handler.sendEmptyMessageDelayed(1, TIME_CLEAR_EVERY);
+					handler.sendEmptyMessageDelayed(Constants.MESSAGE_ID_CLEAN_OLD_CARD_INFO, TIME_CLEAR_EVERY);
 				} else {
 					try {
 						// 清除数据
@@ -64,7 +64,7 @@ public class TimeCardService extends Service {
 					}
 					// 将计时器复原
 					count = 0;
-					handler.sendEmptyMessage(1);
+					handler.sendEmptyMessage(Constants.MESSAGE_ID_CLEAN_OLD_CARD_INFO);
 				}
 				
 				break;
@@ -80,12 +80,11 @@ public class TimeCardService extends Service {
 						// 文件夹为空
 						if (noUploadCardFile == null || noUploadCardFile.length == 0) {
 							// 继续检测
-							handler.sendEmptyMessageDelayed(2, TIME_NETWORK_EVERY);
-                            DebugClass.displayCurrentStack("empty path, monitor again");
+							handler.sendEmptyMessageDelayed(Constants.MESSAGE_ID_UPLOAD_CARD_INFO, TIME_NETWORK_EVERY);
+                            DebugClass.displayCurrentStack("empty path: "+Constants.CARD_INFO_DIR_NO+", monitor again");
 						}
 						// 文件夹不为空，开始上传
 						else {
-                            DebugClass.displayCurrentStack("NOT empty path, upload begin ...");
 							// flag默认为true，表示所有的文件都是以warn开头命名的
 							// flag为false，表示有的文件不是以warn开头命名的，那么上传此文件
 							boolean flag = true;
@@ -107,21 +106,28 @@ public class TimeCardService extends Service {
 							// 转换为TimeCardBean对象
 							TimeCardBean timeCardBean = getTimeCardBean(cardData);
 							// 开始打卡信息
-							punchCard(timeCardBean);
-                            //TODO need to check why no more monitoing?
-						}
-					} else {
-                        DebugClass.displayCurrentStack("path not exist, monitor again");
-						// 若还没有未上传的文件，那么继续检测
-						handler.sendEmptyMessageDelayed(2, TIME_NETWORK_EVERY);
-					}
+                            punchCard(timeCardBean);
+                            DebugClass.displayCurrentStack("upload file: " + currentFile.getName());
+                            //timer started in puchCard, not needed to start here
+                        }
+                    }
+                    else
+                    {
+                        DebugClass.displayCurrentStack("Path not exists: "+Constants.CARD_INFO_DIR_NO);
+                        // 若还没有未上传的文件，那么继续检测
+                        handler.sendEmptyMessageDelayed(Constants.MESSAGE_ID_UPLOAD_CARD_INFO, TIME_NETWORK_EVERY);
+                    }
 				}
 				// 如果没有网络，那么隔继续检测
 				else {
                     DebugClass.displayCurrentStack("network disconnected, monitor again");
-					handler.sendEmptyMessageDelayed(2, TIME_NETWORK_EVERY);
+					handler.sendEmptyMessageDelayed(Constants.MESSAGE_ID_UPLOAD_CARD_INFO, TIME_NETWORK_EVERY);
 				}
 				break;
+
+                default:
+                    DebugClass.displayCurrentStack("Unknown message: " + msg.what);;
+                    break;
 			}
 			
 		};
@@ -215,7 +221,7 @@ public class TimeCardService extends Service {
 			public void onFailure(int arg0, org.apache.http.Header[] arg1,
 					byte[] arg2, Throwable arg3) {
 				// 重新检测是否有网络
-				handler.sendEmptyMessageDelayed(2, TIME_PUNCH_CARD_EVERY);
+				handler.sendEmptyMessageDelayed(Constants.MESSAGE_ID_UPLOAD_CARD_INFO, TIME_PUNCH_CARD_EVERY);
 			}
 
 			@Override
@@ -239,11 +245,11 @@ public class TimeCardService extends Service {
 				    // 上传成功，remove files
 					removeFileUpload(timeCardBean);
 					// 间隔1秒再上传下条打卡数据
-					handler.sendEmptyMessageDelayed(2, 1000);
+					handler.sendEmptyMessageDelayed(Constants.MESSAGE_ID_UPLOAD_CARD_INFO, 1000);
 				} else {
 					// 重新检测是否有网络
 					moveFile2Fail(timeCardBean);
-					handler.sendEmptyMessage(2);
+					handler.sendEmptyMessage(Constants.MESSAGE_ID_UPLOAD_CARD_INFO);
 				}			
 			}
 		});

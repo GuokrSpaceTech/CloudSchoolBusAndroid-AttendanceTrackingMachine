@@ -971,7 +971,7 @@ public class MainActivity extends Activity implements OnClickListener {
             DebugClass.displayCurrentStack("error: camera has been released when take picture!");
             return;
         }
-        playSound();
+//        playSound();
         camera.setOneShotPreviewCallback(new PreviewCallback() {
 
             @Override
@@ -1357,7 +1357,7 @@ public class MainActivity extends Activity implements OnClickListener {
                 Intent intent = new Intent(this, getClass()).addFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP);
                 intent.setAction(NfcAdapter.ACTION_TAG_DISCOVERED);
                 Parcel cardId = Parcel.obtain();
-                cardId.writeString("76968361323171");
+                cardId.writeString("440312967");
                 Tag tag = Tag.CREATOR.createFromParcel(cardId);
                 intent.putExtra(NfcAdapter.EXTRA_TAG, tag);
                 startActivity(intent);
@@ -1442,7 +1442,7 @@ public class MainActivity extends Activity implements OnClickListener {
 
          //   cardNum = "76968361323170";
             if(Constants.DEBUG_MODE_ON)
-                cardNum = "8234568";
+                cardNum = "440312967";
             showTextViewToast("swipe card", "swipe card "+cardNum+"!");
             DebugClass.displayCurrentStack("get card number: "+cardNum);
 

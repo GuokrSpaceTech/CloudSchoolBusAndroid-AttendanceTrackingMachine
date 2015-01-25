@@ -67,7 +67,7 @@ public class Utils {
 		} catch (IllegalAccessException e) {
 			e.printStackTrace();
 		} catch (NoSuchFieldException e) {
-			e.printStackTrace();
+			DebugClass.displayCurrentStack("NoSuchFieldException happened");
 		}
 		return BitmapFactory.decodeFile(path, opts);
 	}
@@ -100,6 +100,7 @@ public class Utils {
 	public static String getMachineNum(Context context) {
 		WifiManager wm = (WifiManager) context.getSystemService(Context.WIFI_SERVICE);
 		String szWLANMAC = wm.getConnectionInfo().getMacAddress();
+        DebugClass.displayCurrentStack("mac: "+szWLANMAC);
         if(Constants.DEBUG_MODE_ON)
         {
             return "30e96523eb91"; // TODO: you can change it to a working mac for testing
