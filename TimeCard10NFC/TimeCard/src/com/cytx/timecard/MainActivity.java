@@ -452,12 +452,10 @@ public class MainActivity extends Activity implements OnClickListener {
             }
 
             allStudentInfoDto = JsonHelp.getObject(oldStudentInfo, AllStudentInfoDto.class);
-            studentList = allStudentInfoDto.getStudent();
-            studentMap = DataCacheTools.list2Map(studentList);
-            reminderList = allStudentInfoDto.getHealthstate();
-            healthReminderList = allStudentInfoDto.getReminderstate();
-            teacherList = allStudentInfoDto.getTeacher();
-            teacherMap = DataCacheTools.list2tMap(teacherList);
+            if(allStudentInfoDto != null)
+            {
+                initDatasFromAllStudent();
+            }
         }
 
         //
@@ -918,12 +916,15 @@ public class MainActivity extends Activity implements OnClickListener {
         AttendanceStateBean attStateBean = null;
 
 
-        if (cardNum != null && reminderList != null) {
+        if (cardNum != null && (reminderList != null || healthReminderList!=null)) {
             attStateBean = new AttendanceStateBean();
             StringBuffer reminders = new StringBuffer();
-            for (int i = 0; i < reminderList.size(); i++) {
-                if (reminderList.get(i).isSelected) {
-                    reminders.append(reminderList.get(i).getId()).append(",");
+            if(reminderList != null)
+            {
+                for (int i = 0; i < reminderList.size(); i++) {
+                    if (reminderList.get(i).isSelected) {
+                        reminders.append(reminderList.get(i).getId()).append(",");
+                    }
                 }
             }
             attStateBean.setReminder(reminders.toString());
@@ -933,9 +934,12 @@ public class MainActivity extends Activity implements OnClickListener {
             attStateBean.setCreatetime(System.currentTimeMillis() / 1000);
 
             StringBuffer healthreminders = new StringBuffer();
-            for (int i = 0; i < healthReminderList.size(); i++) {
-                if (healthReminderList.get(i).isSelected) {
-                    healthreminders.append(healthReminderList.get(i).getHealthString()).append(",");
+            if(healthReminderList != null)
+            {
+                for (int i = 0; i < healthReminderList.size(); i++) {
+                    if (healthReminderList.get(i).isSelected) {
+                        healthreminders.append(healthReminderList.get(i).getHealthString()).append(",");
+                    }
                 }
             }
 
