@@ -4,7 +4,8 @@
     <color name="text_title">#B3AB9D</color>
     <color name="text_student_name">#211C14</color>
     <color name="text_student_info">#695F4D</color>
-    <color name="text_blue">#0B6DFF</color>
+    <color name="text_blue">#0B9DFF</color>
+    <color name="text_blue_dark">#0000FF</color>
     <color name="text_red">#F45100</color>
     <color name="text_white">#FFFFFF</color>
     

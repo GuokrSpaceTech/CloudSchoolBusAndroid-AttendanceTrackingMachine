@@ -17,6 +17,47 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="reminder_text"
-        android:layout_centerInParent="true" />
+        android:layout_centerHorizontal="true"
+        android:layout_alignParentTop="false"
+        android:layout_alignTop="@+id/imageView_reminder" />
+
+    <TextView
+        style="@style/style_curriculum_detail"
+        android:id="@+id/textView_detailed_info"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="detailed_info"
+        android:layout_centerHorizontal="true"
+        android:layout_alignParentTop="false"
+        android:layout_below="@+id/textView_reminder" />
+
+    <TextView
+        style="@style/style_curriculum_time_taken"
+        android:id="@+id/textView_time_taken"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="0"
+        android:layout_alignParentTop="false"
+        android:layout_alignParentLeft="false"
+        android:layout_alignParentBottom="false"
+        android:layout_alignLeft="@+id/imageView_reminder"
+        android:layout_alignBottom="@+id/imageView_reminder"
+        android:paddingLeft="10dp"
+        android:paddingBottom="2dp" />
+
+    <TextView
+        style="@style/style_curriculum_time_total"
+        android:id="@+id/textView_time_total"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="0"
+        android:layout_alignParentTop="false"
+        android:layout_alignParentLeft="false"
+        android:layout_alignParentBottom="false"
+        android:layout_alignParentRight="false"
+        android:layout_alignBottom="@+id/imageView_reminder"
+        android:layout_alignRight="@+id/imageView_reminder"
+        android:paddingRight="10dp"
+        android:paddingBottom="2dp" />
 
 </RelativeLayout>

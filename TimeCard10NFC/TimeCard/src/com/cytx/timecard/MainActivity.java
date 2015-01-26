@@ -147,11 +147,11 @@ public class MainActivity extends Activity implements OnClickListener {
     private TextView receiverView;
     private TextView receiverNoteView;
 
-    public List<HealthReminder>healthReminderList;
+    public List<HealthReminder> currentCurriculumReminderList;
 
     public AllStudentInfoDto allStudentInfoDto;
     public List<StudentDto> studentList; // 所有学生的信息
-    public List<HealthStateDto> reminderList; //所有的提醒
+    public List<HealthReminder> reminderList; //所有的提醒
     public int healthState = 1;
     public List<TeacherDto> teacherList; //所有教师信息
     private HeartPackageDto heartPackageDto;// 心跳包信息
@@ -186,13 +186,15 @@ public class MainActivity extends Activity implements OnClickListener {
 
         // 屏幕常亮
         getWindow().addFlags(
-                WindowManager.LayoutParams.FLAG_DISMISS_KEYGUARD
-                        | WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
+                WindowManager.LayoutParams.FLAG_DISMISS_KEYGUARD|
+                WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON|
+                WindowManager.LayoutParams.FLAG_SHOW_WHEN_LOCKED|
+                WindowManager.LayoutParams.FLAG_TURN_SCREEN_ON);
 
         //初始化view控件
         initViews();
         mainHandler = new MainHandler();
-        healthReminderList=loadHealthData();
+        reminderList = loadHealthData();
         loadHealthRemiderUI();
 
         if(!Constants.INTENT_START_ACTIVITY_ONLY.equals(getIntent().getAction()))
@@ -458,7 +460,6 @@ public class MainActivity extends Activity implements OnClickListener {
             allStudentInfoDto = JsonHelp.getObject(oldStudentInfo, AllStudentInfoDto.class);
             studentList = allStudentInfoDto.getStudent();
             studentMap = DataCacheTools.list2Map(studentList);
-            reminderList = allStudentInfoDto.getHealthstate();
             teacherList = allStudentInfoDto.getTeacher();
             teacherMap = DataCacheTools.list2tMap(teacherList);
         }
@@ -552,34 +553,80 @@ public class MainActivity extends Activity implements OnClickListener {
         }
     }
 
+    //TODO saigon need to get it from network
+    protected List<HealthReminder> loadCurriculum()
+    {
+        List<HealthReminder>list=new ArrayList<HealthReminder>();
+        HealthReminder reminder=new HealthReminder();
+        reminder.setHealthString("钢琴");
+        reminder.setSelected(false);
+        reminder.setTimeTaken(3);
+        reminder.setTimeTotal(10);
+
+        HealthReminder reminder1=new HealthReminder();
+        reminder1.setHealthString("围棋");
+        reminder1.setSelected(false);
+        reminder1.setTimeTaken(0);
+        reminder1.setTimeTotal(15);
+
+        HealthReminder reminder2=new HealthReminder();
+        reminder2.setHealthString("绘画");
+        reminder2.setSelected(false);
+        reminder2.setTimeTaken(12);
+        reminder2.setTimeTotal(30);
+
+        list.add(reminder);
+        list.add(reminder1);
+        list.add(reminder2);
+
+        return list;
+    }
+
     protected List<HealthReminder>loadHealthData()
     {
         List<HealthReminder>list=new ArrayList<HealthReminder>();
         HealthReminder reminder=new HealthReminder();
-        reminder.setHealthString("咳嗽");
+        reminder.setHealthString("趣味科学");
         reminder.setSelected(false);
+        reminder.setTimeTaken(0);
+        reminder.setTimeTotal(10);
 
         HealthReminder reminder1=new HealthReminder();
-        reminder1.setHealthString("发烧");
+        reminder1.setHealthString("现代舞");
         reminder1.setSelected(false);
+        reminder1.setTimeTaken(0);
+        reminder1.setTimeTotal(15);
 
         HealthReminder reminder2=new HealthReminder();
-        reminder2.setHealthString("咽痛");
+        reminder2.setHealthString("陶艺");
         reminder2.setSelected(false);
+        reminder2.setTimeTaken(0);
+        reminder2.setTimeTotal(30);
 
         HealthReminder reminder3=new HealthReminder();
-        reminder3.setHealthString("流涕");
+        reminder3.setHealthString("跆拳道");
         reminder3.setSelected(false);
+        reminder3.setTimeTaken(0);
+        reminder3.setTimeTotal(20);
 
         HealthReminder reminder4=new HealthReminder();
-        reminder4.setHealthString("腹泻");
+        reminder4.setHealthString("奥数");
         reminder4.setSelected(false);
+        reminder4.setTimeTaken(0);
+        reminder4.setTimeTotal(30);
+
+        HealthReminder reminder5=new HealthReminder();
+        reminder5.setHealthString("英语口语");
+        reminder5.setSelected(false);
+        reminder5.setTimeTaken(0);
+        reminder5.setTimeTotal(30);
 
         list.add(reminder);
         list.add(reminder1);
         list.add(reminder2);
         list.add(reminder3);
         list.add(reminder4);
+        list.add(reminder5);
 
         return list;
 
@@ -588,12 +635,12 @@ public class MainActivity extends Activity implements OnClickListener {
     {
         if(healthCheckAdapter==null)
         {
-            healthCheckAdapter=new HealthRemindersAdapter(getApplicationContext(), mainHandler, healthReminderList);
+            healthCheckAdapter=new HealthRemindersAdapter(getApplicationContext(),  mainHandler, currentCurriculumReminderList);
             horizontalListView_healthcheck.setAdapter(healthCheckAdapter);
         }
         else
         {
-            healthCheckAdapter.setReminderDtoList(healthReminderList);
+            healthCheckAdapter.setReminderDtoList(currentCurriculumReminderList);
             healthCheckAdapter.notifyDataSetChanged();
         }
     }
@@ -753,6 +800,10 @@ public class MainActivity extends Activity implements OnClickListener {
                                         studentInfo);
                             }
                         }
+                        else
+                        {
+                            DebugClass.displayCurrentStack("Fail to get student info with return code: "+code);
+                        }
                         // 加载心跳包信息
                         getStudentCheck();
 
@@ -851,7 +902,7 @@ public class MainActivity extends Activity implements OnClickListener {
                                 allStudentInfoDto.setTeacher(teacherList);
 
 
-                                reminderList = allStudentInfoDto.getHealthstate();
+                                DebugClass.displayCurrentStack("add reminder: "+reminderList.size());
 
                                 if (reminderList != null && reminderList.size() != 0)
                                     loadRemindersUI();
@@ -899,9 +950,9 @@ public class MainActivity extends Activity implements OnClickListener {
             attStateBean.setCreatetime(System.currentTimeMillis() / 1000);
 
             StringBuilder healthreminders = new StringBuilder();
-            for (int i = 0; i < healthReminderList.size(); i++) {
-                if (healthReminderList.get(i).isSelected) {
-                    healthreminders.append(healthReminderList.get(i).getHealthString()).append(",");
+            for (int i = 0; i < currentCurriculumReminderList.size(); i++) {
+                if (currentCurriculumReminderList.get(i).isSelected) {
+                    healthreminders.append(currentCurriculumReminderList.get(i).getHealthString()).append(",");
                 }
             }
 
@@ -1184,6 +1235,8 @@ public class MainActivity extends Activity implements OnClickListener {
                     {
                         confirmImageView.setImageResource(reminderClickedNum>0?R.drawable.confirm_blue:R.drawable.confirm_white);
                     }
+                    healthCheckAdapter.notifyDataSetChanged();
+                    remindersAdapter.notifyDataSetChanged();
                     break;
             }
         }
@@ -1207,14 +1260,14 @@ public class MainActivity extends Activity implements OnClickListener {
 
         if(healthCheckAdapter!=null)
         {
-            if(healthReminderList!=null)
+            if(currentCurriculumReminderList !=null)
             {
-                for (int i=0;i<healthReminderList.size();i++)
+                for (int i=0;i< currentCurriculumReminderList.size();i++)
                 {
-                    HealthReminder health=healthReminderList.get(i);
+                    HealthReminder health= currentCurriculumReminderList.get(i);
                     health.setSelected(false);
                 }
-                healthCheckAdapter.setReminderDtoList(healthReminderList);
+                healthCheckAdapter.setReminderDtoList(currentCurriculumReminderList);
                 healthCheckAdapter.notifyDataSetChanged();
             }
         }
@@ -1225,7 +1278,7 @@ public class MainActivity extends Activity implements OnClickListener {
             {
                 for (int i=0;i<reminderList.size();i++)
                 {
-                    HealthStateDto dto=reminderList.get(i);
+                    HealthReminder dto=reminderList.get(i);
                     dto.setSelected(false);
                 }
                 remindersAdapter.setReminderDtoList(reminderList);
@@ -1311,6 +1364,11 @@ public class MainActivity extends Activity implements OnClickListener {
                 if (avdDto != null) {
                     FileTools.loadAvdImage(avdImageView, avdDto.getFilepath(),
                             Constants.AVD_PIC_DIR, Constants.AVD_PIC_NAME);
+                    DebugClass.displayCurrentStack("Success get AD and success to  ecode pic");
+                }
+                else
+                {
+                    DebugClass.displayCurrentStack("Success get AD but fail to decode pic");
                 }
             }
 
@@ -1461,6 +1519,8 @@ public class MainActivity extends Activity implements OnClickListener {
                 StudentDto studentDto = (StudentDto) currentObject;
                 loadStudentInfoUI(studentDto);
                 loadReceiverInfoUI(studentDto);
+                currentCurriculumReminderList = loadCurriculum();
+                loadHealthRemiderUI();
                 takePic();
 
             } else if (currentObject instanceof TeacherDto) {

@@ -9,7 +9,9 @@ import android.view.ViewGroup;
 import android.widget.BaseAdapter;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.os.Handler;
 
+import com.cytx.timecard.R;
 import com.cytx.timecard.constants.Constants;
 import com.cytx.timecard.dto.HealthReminder;
 
@@ -82,6 +84,9 @@ public class HealthRemindersAdapter extends BaseAdapter {
 					layout.reminders_item, parent, false);
 			viewHolder = new ViewHolder();
 			viewHolder.reminder_desc = (TextView) convertView.findViewById(id.textView_reminder);
+            viewHolder.reminder_detail = (TextView) convertView.findViewById(id.textView_detailed_info);
+            viewHolder.reminder_time_taken = (TextView) convertView.findViewById(id.textView_time_taken);
+            viewHolder.reminder_time_total = (TextView) convertView.findViewById(id.textView_time_total);
             viewHolder.imageView = (ImageView) convertView.findViewById(id.imageView_reminder);
 			convertView.setTag(viewHolder);
 		} else {
@@ -104,7 +109,11 @@ public class HealthRemindersAdapter extends BaseAdapter {
         });
 
         HealthReminder reminderDto = reminderDtoList.get(position);
+        viewHolder.imageView.setBackgroundResource(reminderDto.isSelected()?R.drawable.gradient_red: drawable.white_grey_border);
 		viewHolder.reminder_desc.setText(reminderDto.getHealthString());
+        viewHolder.reminder_detail.setText(reminderDto.getDetailedInfo());
+        viewHolder.reminder_time_taken.setText(String.valueOf(reminderDto.getTimeTaken()));
+        viewHolder.reminder_time_total.setText(String.valueOf(reminderDto.getTimeTotal()));
 
 		return convertView;
 	}
@@ -120,6 +129,9 @@ public class HealthRemindersAdapter extends BaseAdapter {
 
     public class ViewHolder {
 		public TextView reminder_desc;
+        public TextView reminder_detail;
+        public TextView reminder_time_taken;
+        public TextView reminder_time_total;
         public ImageView imageView;
 	}
 
