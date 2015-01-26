@@ -1243,10 +1243,10 @@ public class MainActivity extends Activity implements OnClickListener {
         }
 
         clearReminderUI();
-        confirmImageView.setImageResource(R.drawable.confirm_white);
     }
 
     private void clearReminderUI() {
+        confirmImageView.setImageResource(R.drawable.confirm_white);
 
         if(healthCheckAdapter!=null)
         {
