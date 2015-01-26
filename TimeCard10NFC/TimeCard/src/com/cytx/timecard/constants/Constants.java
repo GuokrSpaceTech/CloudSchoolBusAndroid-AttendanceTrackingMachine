@@ -11,8 +11,11 @@ import com.cytx.timecard.utility.FileTools;
  * 类说明： 常量类
  */
 public class Constants {
-	
-	// 是否需要版本更新
+
+    public static final String LAST_RUN_VERSION = "last_run_version";
+    // TODO confirm below line whenever change version in manifest.xml
+    public static final boolean IS_API_CHANGED_FROM_LAST_VERSION = true;
+    // 是否需要版本更新
 	public static boolean IS_NEED_UPDATE = false;
 	
 	//=====================数据缓存=================//

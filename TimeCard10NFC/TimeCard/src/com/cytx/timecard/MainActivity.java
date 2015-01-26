@@ -66,6 +66,7 @@ import com.cytx.timecard.service.WebService;
 import com.cytx.timecard.service.impl.WebServiceImpl;
 import com.cytx.timecard.utility.DataCacheTools;
 import com.cytx.timecard.utility.DateTools;
+import com.cytx.timecard.utility.DebugClass;
 import com.cytx.timecard.utility.FileTools;
 import com.cytx.timecard.utility.JsonHelp;
 import com.cytx.timecard.utility.UIUtils;
@@ -191,8 +192,6 @@ public class MainActivity extends Activity implements OnClickListener {
         //初始化view控件
         initViews();
         mainHandler = new MainHandler();
-        healthReminderList=loadHealthData();
-        loadHealthRemiderUI();
         // 初始化各种listener监听事件
         initListeners();
         // 初始化数据
@@ -412,6 +411,21 @@ public class MainActivity extends Activity implements OnClickListener {
         if ("".equals(TimeCardApplicatoin.getInstance().getStringFromShares(Constants.FIRST_DATE, ""))) {
             TimeCardApplicatoin.getInstance().setStringToShares(Constants.FIRST_DATE, DateTools.getCurrentDate());
         }
+
+        boolean isStudentInfoNeedUpdate = false;
+        String version = TimeCardApplicatoin.getInstance().getVersionName();
+        DebugClass.displayCurrentStack("now check if last run version is: "+version);
+        if (!version.equals(TimeCardApplicatoin.getInstance().getStringFromShares(Constants.LAST_RUN_VERSION, "")))
+        {
+            DebugClass.displayCurrentStack("upgreade to version: " + version);
+            TimeCardApplicatoin.getInstance().setStringToShares(Constants.LAST_RUN_VERSION, version);
+            if(Constants.IS_API_CHANGED_FROM_LAST_VERSION)
+            {
+                DebugClass.displayCurrentStack("need to download all student info  for version: "+version);
+                isStudentInfoNeedUpdate = true;
+            }
+        }
+
         // 清除缓存数据
         DataCacheTools.clearCacheDatas();
 
@@ -421,7 +435,7 @@ public class MainActivity extends Activity implements OnClickListener {
                 Constants.STUDENT_INFO_DIR + "/"
                         + Constants.STUDENT_INFO_FILE_NAME, "");
 
-        if (oldStudentInfo == null || oldStudentInfo.equals("")) {
+        if (oldStudentInfo == null || oldStudentInfo.equals("") || isStudentInfoNeedUpdate) {
             if (Utils.checkNetworkInfo(this)) {
                 // 加载所有学生的信息
                 loadAllStudentInfo();
@@ -441,12 +455,14 @@ public class MainActivity extends Activity implements OnClickListener {
             studentList = allStudentInfoDto.getStudent();
             studentMap = DataCacheTools.list2Map(studentList);
             reminderList = allStudentInfoDto.getHealthstate();
+            healthReminderList = allStudentInfoDto.getReminderstate();
             teacherList = allStudentInfoDto.getTeacher();
             teacherMap = DataCacheTools.list2tMap(teacherList);
         }
 
         //
         loadRemindersUI();
+        loadHealthRemiderUI();
 
         // 下载广告图片
         downloadAvdPicture();
@@ -663,6 +679,7 @@ public class MainActivity extends Activity implements OnClickListener {
                         loadingLinearLayout.setVisibility(View.VISIBLE);
                         loadingTextView.setText("数据加载中...\nLoading...");
                         cancelTimeOperation();
+                        DebugClass.displayCurrentStack();
                     }
 
                     @Override
@@ -672,6 +689,7 @@ public class MainActivity extends Activity implements OnClickListener {
                             UIUtils.showToastSererError(arg3,
                                     getApplicationContext());
                         }
+                        DebugClass.displayCurrentStack();
                         cancelTimeOperation();
                         loadingLinearLayout.setVisibility(View.GONE);
 
@@ -685,14 +703,7 @@ public class MainActivity extends Activity implements OnClickListener {
                         allStudentInfoDto = JsonHelp.getObject(oldStudentInfo,
                                 AllStudentInfoDto.class);
 
-                        studentList = allStudentInfoDto.getStudent();
-                        studentMap = DataCacheTools.list2Map(studentList);
-                        reminderList = allStudentInfoDto.getHealthstate();
-                        teacherList = allStudentInfoDto.getTeacher();
-                        teacherMap = DataCacheTools.list2tMap(teacherList);
-
-                        if (reminderList != null && reminderList.size() != 0)
-                            loadRemindersUI();
+                        initDatasFromAllStudent();
                     }
 
                     @Override
@@ -708,6 +719,7 @@ public class MainActivity extends Activity implements OnClickListener {
                         // 获取header中参数Code的值
                         String code = maps.get("Code");
                         if (code == null) {
+                            DebugClass.displayCurrentStack("no code returned by server");
                             return;
                         }
                         // code=1时，成功；否则失败
@@ -717,19 +729,14 @@ public class MainActivity extends Activity implements OnClickListener {
                             // 得到所有学生jiao'shi的信息
                             allStudentInfoDto = JsonHelp.getObject(studentInfo,
                                     AllStudentInfoDto.class);
+                            DebugClass.displayCurrentStack("http resp:  "+studentInfo);
 
                             if (allStudentInfoDto != null) {
-                                studentList = allStudentInfoDto.getStudent();
-                                studentMap = DataCacheTools.list2Map(studentList);
-                                reminderList = allStudentInfoDto.getHealthstate();
+                                initDatasFromAllStudent();
 
-                                //Update the reminders
-                                if (reminderList != null && reminderList.size() != 0)
-                                    loadRemindersUI();
-
-                                // 将学生信息保存到本地
-                                teacherList = allStudentInfoDto.getTeacher();
-                                teacherMap = DataCacheTools.list2tMap(teacherList);
+                                DebugClass.displayCurrentStack("all student info: Is_training_agency="+allStudentInfoDto.getIs_training_agency()
+                                +" teachers="+teacherList.size()+" students="+studentList.size()
+                                +" reminderState="+reminderList.size()+" healthSates="+healthReminderList.size());
 
                                 // 将学生信息保存到本地
                                 FileTools.save2SDCard(
@@ -737,6 +744,26 @@ public class MainActivity extends Activity implements OnClickListener {
                                         Constants.STUDENT_INFO_FILE_NAME,
                                         studentInfo);
                             }
+                            else
+                            {
+                                DebugClass.displayCurrentStack("server resp with empty student info");
+                            }
+                        }
+                        else
+                        {
+                            DebugClass.displayCurrentStack("server resp fail with code: "+code);
+
+                            // 如果加载学生数据失败，那么就用旧的数据
+                            String oldStudentInfo = FileTools.readFileByLines(
+                                    Constants.STUDENT_INFO_DIR + "/"
+                                            + Constants.STUDENT_INFO_FILE_NAME, "");
+
+                            if (oldStudentInfo.equals(""))
+                                return;
+                            allStudentInfoDto = JsonHelp.getObject(oldStudentInfo,
+                                    AllStudentInfoDto.class);
+                            if(allStudentInfoDto != null)
+                                initDatasFromAllStudent();
                         }
                         // 加载心跳包信息
                         getStudentCheck();
@@ -746,6 +773,24 @@ public class MainActivity extends Activity implements OnClickListener {
                     }
 
                 });
+    }
+
+    private void initDatasFromAllStudent() {
+        studentList = allStudentInfoDto.getStudent();
+        studentMap = DataCacheTools.list2Map(studentList);
+        reminderList = allStudentInfoDto.getHealthstate();
+        healthReminderList = allStudentInfoDto.getReminderstate();
+        teacherList = allStudentInfoDto.getTeacher();
+        teacherMap = DataCacheTools.list2tMap(teacherList);
+
+        if (reminderList != null && reminderList.size() != 0)
+            loadRemindersUI();
+
+        if (healthReminderList == null || healthReminderList.size() == 0)
+        {
+            healthReminderList = loadHealthData();
+        }
+        loadHealthRemiderUI();
     }
 
     // 下载心跳包信息
@@ -819,6 +864,7 @@ public class MainActivity extends Activity implements OnClickListener {
                             String studentCheck = new String(arg2);
                             heartPackageDto = JsonHelp.getObject(studentCheck,
                                     HeartPackageDto.class);
+                            DebugClass.displayCurrentStack("http resp:  "+studentCheck);
 
                             if (heartPackageDto.getAddstudent().size() != 0
                                     || heartPackageDto.getCard().size() != 0
@@ -837,9 +883,12 @@ public class MainActivity extends Activity implements OnClickListener {
 
 
                                 reminderList = allStudentInfoDto.getHealthstate();
+                                healthReminderList = allStudentInfoDto.getReminderstate();
 
                                 if (reminderList != null && reminderList.size() != 0)
                                     loadRemindersUI();
+                                if (healthReminderList != null && healthReminderList.size() != 0)
+                                    loadHealthRemiderUI();
 
                                 // 将学生信息保存到本地
                                 FileTools.save2SDCard(
@@ -1159,6 +1208,7 @@ public class MainActivity extends Activity implements OnClickListener {
                 // 手动同步结束
                 case Constants.MESSAGE_UPDATE_UI:
                     loadRemindersUI();
+                    loadHealthRemiderUI();
                     break;
                 case Constants.MESSAGE_UPDATE_CONFIRM_BUTTON:
                     int reminderClickedNum = remindersAdapter.getClickedNum();
@@ -1192,6 +1242,12 @@ public class MainActivity extends Activity implements OnClickListener {
             receiverAdapter.notifyDataSetChanged();
         }
 
+        clearReminderUI();
+        confirmImageView.setImageResource(R.drawable.confirm_white);
+    }
+
+    private void clearReminderUI() {
+
         if(healthCheckAdapter!=null)
         {
             if(healthReminderList!=null)
@@ -1220,8 +1276,6 @@ public class MainActivity extends Activity implements OnClickListener {
 
             }
         }
-
-        confirmImageView.setImageResource(R.drawable.confirm_white);
     }
 
     private void UploadAttState(AttendanceStateBean attState) {
@@ -1247,6 +1301,7 @@ public class MainActivity extends Activity implements OnClickListener {
                 // code=1时，成功；否则失败
                 if ("1".equals(code)) {
                     showTextViewToast("记录成功！", "Reminders Captured");
+                    clearReminderUI();
                 }
             }
         });
