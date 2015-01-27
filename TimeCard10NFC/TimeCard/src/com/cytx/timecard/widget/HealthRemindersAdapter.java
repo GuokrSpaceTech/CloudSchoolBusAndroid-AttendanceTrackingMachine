@@ -12,6 +12,7 @@ import android.widget.TextView;
 
 import com.cytx.timecard.constants.Constants;
 import com.cytx.timecard.dto.HealthReminder;
+import com.cytx.timecard.utility.DebugClass;
 
 import java.util.List;
 
@@ -95,7 +96,7 @@ public class HealthRemindersAdapter extends BaseAdapter {
                 reminderDtoList.get(position).isSelected = !(reminderDtoList.get(position).isSelected);
 
                 if(reminderDtoList.get(position).isSelected )
-                    view.setBackgroundResource(drawable.gradient_red);
+                    view.setBackgroundResource(drawable.gradient_blue);
                 else
                     view.setBackgroundResource(drawable.white_grey_border);
 
@@ -104,7 +105,8 @@ public class HealthRemindersAdapter extends BaseAdapter {
         });
 
         HealthReminder reminderDto = reminderDtoList.get(position);
-		viewHolder.reminder_desc.setText(reminderDto.getHealthString());
+        DebugClass.displayCurrentStack("HealthReminder: id="+reminderDto.getId()+" reminder="+reminderDto.getReminder());
+		viewHolder.reminder_desc.setText(reminderDto.getReminder());
 
 		return convertView;
 	}

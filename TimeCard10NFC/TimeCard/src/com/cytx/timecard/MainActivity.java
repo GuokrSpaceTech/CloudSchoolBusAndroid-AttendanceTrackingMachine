@@ -147,7 +147,7 @@ public class MainActivity extends Activity implements OnClickListener {
     private TextView receiverView;
     private TextView receiverNoteView;
 
-    public List<HealthReminder>healthReminderList;
+    public List<HealthReminder> healthReminderList;
 
     public AllStudentInfoDto allStudentInfoDto;
     public List<StudentDto> studentList; // 所有学生的信息
@@ -544,7 +544,7 @@ public class MainActivity extends Activity implements OnClickListener {
     protected void loadRemindersUI() {
         if (remindersAdapter == null) {
             remindersAdapter = new RemindersAdapter(getApplicationContext(), mainHandler, reminderList);
-            horizontalListView_reminders.setAdapter(remindersAdapter);
+            horizontalListView_healthcheck.setAdapter(remindersAdapter);
         } else {
             remindersAdapter.setReminderDtoList(reminderList);
             remindersAdapter.notifyDataSetChanged();
@@ -555,23 +555,23 @@ public class MainActivity extends Activity implements OnClickListener {
     {
         List<HealthReminder>list=new ArrayList<HealthReminder>();
         HealthReminder reminder=new HealthReminder();
-        reminder.setHealthString("咳嗽");
+        reminder.setReminder("咳嗽");
         reminder.setSelected(false);
 
         HealthReminder reminder1=new HealthReminder();
-        reminder1.setHealthString("发烧");
+        reminder1.setReminder("发烧");
         reminder1.setSelected(false);
 
         HealthReminder reminder2=new HealthReminder();
-        reminder2.setHealthString("咽痛");
+        reminder2.setReminder("咽痛");
         reminder2.setSelected(false);
 
         HealthReminder reminder3=new HealthReminder();
-        reminder3.setHealthString("流涕");
+        reminder3.setReminder("流涕");
         reminder3.setSelected(false);
 
         HealthReminder reminder4=new HealthReminder();
-        reminder4.setHealthString("腹泻");
+        reminder4.setReminder("腹泻");
         reminder4.setSelected(false);
 
         list.add(reminder);
@@ -588,7 +588,7 @@ public class MainActivity extends Activity implements OnClickListener {
         if(healthCheckAdapter==null)
         {
             healthCheckAdapter=new HealthRemindersAdapter(getApplicationContext(), mainHandler, healthReminderList);
-            horizontalListView_healthcheck.setAdapter(healthCheckAdapter);
+            horizontalListView_reminders.setAdapter(healthCheckAdapter);
         }
         else
         {
@@ -788,6 +788,10 @@ public class MainActivity extends Activity implements OnClickListener {
         {
             healthReminderList = loadHealthData();
         }
+        for(HealthReminder reminder : healthReminderList)
+        {
+            DebugClass.displayCurrentStack("HealthReminder: id="+reminder.getId()+" reminder="+reminder.getReminder());
+        }
         loadHealthRemiderUI();
     }
 
@@ -938,7 +942,7 @@ public class MainActivity extends Activity implements OnClickListener {
             {
                 for (int i = 0; i < healthReminderList.size(); i++) {
                     if (healthReminderList.get(i).isSelected) {
-                        healthreminders.append(healthReminderList.get(i).getHealthString()).append(",");
+                        healthreminders.append(healthReminderList.get(i).getReminder()).append(",");
                     }
                 }
             }
@@ -1217,13 +1221,13 @@ public class MainActivity extends Activity implements OnClickListener {
                 case Constants.MESSAGE_UPDATE_CONFIRM_BUTTON:
                     int reminderClickedNum = remindersAdapter.getClickedNum();
                     int healthReminderClickedNum = healthCheckAdapter.getClickedNum();
-                    if(healthReminderClickedNum>0)
+                    if(reminderClickedNum>0)
                     {
                         confirmImageView.setImageResource(R.drawable.confirm_red);
                     }
                     else
                     {
-                        confirmImageView.setImageResource(reminderClickedNum>0?R.drawable.confirm_blue:R.drawable.confirm_white);
+                        confirmImageView.setImageResource(healthReminderClickedNum>0?R.drawable.confirm_blue:R.drawable.confirm_white);
                     }
                     break;
             }

@@ -10,17 +10,17 @@ import java.util.List;
  */
 public class AllStudentInfoDto {
 
-    private Boolean is_training_agency;
+    private Integer is_training_agency;
 	private List<StudentDto> student;
     private List<HealthReminder> reminderstate;
     private List<HealthStateDto> healthstate;
     private List<TeacherDto> teacher;
 
-    public Boolean getIs_training_agency() {
+    public Integer getIs_training_agency() {
         return is_training_agency;
     }
 
-    public void setIs_training_agency(Boolean is_training_agency) {
+    public void setIs_training_agency(Integer is_training_agency) {
         this.is_training_agency = is_training_agency;
     }
 

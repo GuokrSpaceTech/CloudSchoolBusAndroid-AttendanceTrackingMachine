@@ -95,7 +95,7 @@ public class RemindersAdapter extends BaseAdapter {
                 reminderDtoList.get(position).isSelected = !(reminderDtoList.get(position).isSelected);
 
                 if(reminderDtoList.get(position).isSelected ) {
-                    view.setBackgroundResource(R.drawable.gradient_blue);
+                    view.setBackgroundResource(drawable.gradient_red);
                 }
                 else
                     view.setBackgroundResource(R.drawable.white_grey_border);
