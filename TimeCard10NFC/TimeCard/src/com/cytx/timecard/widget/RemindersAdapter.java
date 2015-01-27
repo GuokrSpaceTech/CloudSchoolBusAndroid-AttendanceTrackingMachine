@@ -111,6 +111,7 @@ public class RemindersAdapter extends BaseAdapter {
 	}
 
     public int getClickedNum() {
+        if(reminderDtoList == null) return 0;
         int count = 0;
         for(HealthStateDto item : reminderDtoList)
         {
