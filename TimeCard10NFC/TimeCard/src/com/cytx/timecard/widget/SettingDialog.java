@@ -65,7 +65,7 @@ public class SettingDialog extends Dialog implements OnClickListener {
     private List<StudentDto> studentList;// 所有学生的信息
 	private Map<String, StudentDto> studentMap;// 将list 转为map；
 	private AllStudentInfoDto allStudentInfoDto;
-	private List<HealthStateDto> reminderList; //所有的提醒
+	private List<LessionDto> reminderList; //所有的提醒
 	private List<TeacherDto> teacherList; //所有教师信息
 	private Map<String,TeacherDto>  teacherMap;
 	
@@ -234,7 +234,7 @@ public class SettingDialog extends Dialog implements OnClickListener {
 
 									studentList = allStudentInfoDto.getStudent();
 									studentMap = DataCacheTools.list2Map(studentList);
-									reminderList = allStudentInfoDto.getHealthstate();
+									reminderList = (allStudentInfoDto);
 									teacherList =allStudentInfoDto.getTeacher();
 									teacherMap=DataCacheTools.list2tMap(teacherList);
 									// 将学生信息保存到本地

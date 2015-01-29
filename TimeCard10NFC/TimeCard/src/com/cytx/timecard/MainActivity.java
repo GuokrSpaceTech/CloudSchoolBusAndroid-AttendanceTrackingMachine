@@ -56,10 +56,12 @@ import com.cytx.timecard.dto.ClassInfoDto;
 import com.cytx.timecard.dto.HealthReminder;
 import com.cytx.timecard.dto.HealthStateDto;
 import com.cytx.timecard.dto.HeartPackageDto;
+import com.cytx.timecard.dto.LessionDto;
 import com.cytx.timecard.dto.RecieverDto;
 import com.cytx.timecard.dto.SmartCardInfoDto;
 import com.cytx.timecard.dto.StudentDto;
 import com.cytx.timecard.dto.TeacherDto;
+import com.cytx.timecard.dto.TrainingDto;
 import com.cytx.timecard.jdbc.DataBaseUtils;
 import com.cytx.timecard.service.TimeCardService;
 import com.cytx.timecard.service.WebService;
@@ -147,11 +149,11 @@ public class MainActivity extends Activity implements OnClickListener {
     private TextView receiverView;
     private TextView receiverNoteView;
 
-    public List<HealthReminder> currentCurriculumReminderList;
+    public List<LessionDto> currentCurriculumReminderList;
 
     public AllStudentInfoDto allStudentInfoDto;
     public List<StudentDto> studentList; // 所有学生的信息
-    public List<HealthReminder> reminderList; //所有的提醒
+    public List<LessionDto> reminderList; //所有的提醒
     public int healthState = 1;
     public List<TeacherDto> teacherList; //所有教师信息
     private HeartPackageDto heartPackageDto;// 心跳包信息
@@ -194,8 +196,8 @@ public class MainActivity extends Activity implements OnClickListener {
         //初始化view控件
         initViews();
         mainHandler = new MainHandler();
-        reminderList = loadHealthData();
-        loadHealthRemiderUI();
+//        reminderList = loadHealthData();
+//        loadHealthRemiderUI();
 
         if(!Constants.INTENT_START_ACTIVITY_ONLY.equals(getIntent().getAction()))
         {
@@ -554,82 +556,39 @@ public class MainActivity extends Activity implements OnClickListener {
     }
 
     //TODO saigon need to get it from network
-    protected List<HealthReminder> loadCurriculum()
+    protected List<LessionDto> loadCurriculum(AllStudentInfoDto allInfo, String studentID)
     {
-        List<HealthReminder>list=new ArrayList<HealthReminder>();
-        HealthReminder reminder=new HealthReminder();
-        reminder.setHealthString("钢琴");
-        reminder.setSelected(false);
-        reminder.setTimeTaken(3);
-        reminder.setTimeTotal(10);
-
-        HealthReminder reminder1=new HealthReminder();
-        reminder1.setHealthString("围棋");
-        reminder1.setSelected(false);
-        reminder1.setTimeTaken(0);
-        reminder1.setTimeTotal(15);
-
-        HealthReminder reminder2=new HealthReminder();
-        reminder2.setHealthString("绘画");
-        reminder2.setSelected(false);
-        reminder2.setTimeTaken(12);
-        reminder2.setTimeTotal(30);
-
-        list.add(reminder);
-        list.add(reminder1);
-        list.add(reminder2);
-
-        return list;
+        for(TrainingDto training : allInfo.getTraining())
+        {
+            if(studentID.equals(training.getStudentid()))
+            {
+                return training.getLesson();
+            }
+        }
+        return null;
     }
 
-    protected List<HealthReminder>loadHealthData()
+    protected List<LessionDto> loadHealthData(AllStudentInfoDto allInfo)
     {
-        List<HealthReminder>list=new ArrayList<HealthReminder>();
-        HealthReminder reminder=new HealthReminder();
-        reminder.setHealthString("趣味科学");
-        reminder.setSelected(false);
-        reminder.setTimeTaken(0);
-        reminder.setTimeTotal(10);
+        Map<String, LessionDto> lessons=new HashMap<String, LessionDto>();
 
-        HealthReminder reminder1=new HealthReminder();
-        reminder1.setHealthString("现代舞");
-        reminder1.setSelected(false);
-        reminder1.setTimeTaken(0);
-        reminder1.setTimeTotal(15);
-
-        HealthReminder reminder2=new HealthReminder();
-        reminder2.setHealthString("陶艺");
-        reminder2.setSelected(false);
-        reminder2.setTimeTaken(0);
-        reminder2.setTimeTotal(30);
-
-        HealthReminder reminder3=new HealthReminder();
-        reminder3.setHealthString("跆拳道");
-        reminder3.setSelected(false);
-        reminder3.setTimeTaken(0);
-        reminder3.setTimeTotal(20);
-
-        HealthReminder reminder4=new HealthReminder();
-        reminder4.setHealthString("奥数");
-        reminder4.setSelected(false);
-        reminder4.setTimeTaken(0);
-        reminder4.setTimeTotal(30);
-
-        HealthReminder reminder5=new HealthReminder();
-        reminder5.setHealthString("英语口语");
-        reminder5.setSelected(false);
-        reminder5.setTimeTaken(0);
-        reminder5.setTimeTotal(30);
-
-        list.add(reminder);
-        list.add(reminder1);
-        list.add(reminder2);
-        list.add(reminder3);
-        list.add(reminder4);
-        list.add(reminder5);
-
-        return list;
-
+        for(TrainingDto training : allInfo.getTraining())
+        {
+            for(LessionDto lesson : training.getLesson())
+            {
+                if(lessons.containsKey(lesson.getLessonid()))
+                {
+                    int num = lessons.get(lesson.getLessonid()).getNum();
+                    lessons.get(lesson.getLessonid()).setNum(num+1);
+                }
+                else
+                {
+                    lesson.setNum(1);
+                    lessons.put(lesson.getLessonid(), lesson);
+                }
+            }
+        }
+        return new ArrayList<LessionDto>(lessons.values());
     }
     protected void loadHealthRemiderUI()
     {
@@ -749,7 +708,7 @@ public class MainActivity extends Activity implements OnClickListener {
 
                         studentList = allStudentInfoDto.getStudent();
                         studentMap = DataCacheTools.list2Map(studentList);
-                        reminderList = allStudentInfoDto.getHealthstate();
+                        reminderList = loadHealthData(allStudentInfoDto);
                         teacherList = allStudentInfoDto.getTeacher();
                         teacherMap = DataCacheTools.list2tMap(teacherList);
 
@@ -952,7 +911,7 @@ public class MainActivity extends Activity implements OnClickListener {
             StringBuilder healthreminders = new StringBuilder();
             for (int i = 0; i < currentCurriculumReminderList.size(); i++) {
                 if (currentCurriculumReminderList.get(i).isSelected) {
-                    healthreminders.append(currentCurriculumReminderList.get(i).getHealthString()).append(",");
+                    healthreminders.append(currentCurriculumReminderList.get(i).getLessonname()).append(",");
                 }
             }
 
@@ -1264,8 +1223,8 @@ public class MainActivity extends Activity implements OnClickListener {
             {
                 for (int i=0;i< currentCurriculumReminderList.size();i++)
                 {
-                    HealthReminder health= currentCurriculumReminderList.get(i);
-                    health.setSelected(false);
+                    LessionDto health= currentCurriculumReminderList.get(i);
+                    health.isSelected = false;
                 }
                 healthCheckAdapter.setReminderDtoList(currentCurriculumReminderList);
                 healthCheckAdapter.notifyDataSetChanged();
@@ -1278,8 +1237,8 @@ public class MainActivity extends Activity implements OnClickListener {
             {
                 for (int i=0;i<reminderList.size();i++)
                 {
-                    HealthReminder dto=reminderList.get(i);
-                    dto.setSelected(false);
+                    LessionDto dto=reminderList.get(i);
+                    dto.isSelected = false;
                 }
                 remindersAdapter.setReminderDtoList(reminderList);
                 remindersAdapter.notifyDataSetChanged();
@@ -1519,9 +1478,8 @@ public class MainActivity extends Activity implements OnClickListener {
                 StudentDto studentDto = (StudentDto) currentObject;
                 loadStudentInfoUI(studentDto);
                 loadReceiverInfoUI(studentDto);
-                currentCurriculumReminderList = loadCurriculum();
-                loadHealthRemiderUI();
-                takePic();
+                currentCurriculumReminderList = loadCurriculum(allStudentInfoDto, cardNum);
+                loadHealthRemiderUI();                takePic();
 
             } else if (currentObject instanceof TeacherDto) {
                 TeacherDto teacherDto = (TeacherDto) currentObject;

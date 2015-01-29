@@ -14,6 +14,7 @@ import android.os.Handler;
 import com.cytx.timecard.R;
 import com.cytx.timecard.constants.Constants;
 import com.cytx.timecard.dto.HealthReminder;
+import com.cytx.timecard.dto.LessionDto;
 
 import java.util.List;
 
@@ -31,7 +32,7 @@ public class HealthRemindersAdapter extends BaseAdapter {
 
     private final Handler handler;
     private Context context;
-	private List<HealthReminder> reminderDtoList;
+	private List<LessionDto> reminderDtoList;
     private int     originalColor = drawable.confirm_white;
 
     public Context getContext() {
@@ -42,15 +43,15 @@ public class HealthRemindersAdapter extends BaseAdapter {
         this.context = context;
     }
 
-    public List<HealthReminder> getReminderDtoList() {
+    public List<LessionDto> getReminderDtoList() {
         return reminderDtoList;
     }
 
-    public void setReminderDtoList(List<HealthReminder> reminderDtoList) {
+    public void setReminderDtoList(List<LessionDto> reminderDtoList) {
         this.reminderDtoList = reminderDtoList;
     }
 
-    public HealthRemindersAdapter(Context context, Handler handler, List<HealthReminder> list) {
+    public HealthRemindersAdapter(Context context, Handler handler, List<LessionDto> list) {
 		this.context = context;
         this.handler = handler;
 		this.reminderDtoList = list;
@@ -108,21 +109,21 @@ public class HealthRemindersAdapter extends BaseAdapter {
             }
         });
 
-        HealthReminder reminderDto = reminderDtoList.get(position);
-        viewHolder.imageView.setBackgroundResource(reminderDto.isSelected()?R.drawable.gradient_red: drawable.white_grey_border);
-		viewHolder.reminder_desc.setText(reminderDto.getHealthString());
-        viewHolder.reminder_detail.setText(reminderDto.getDetailedInfo());
-        viewHolder.reminder_time_taken.setText(String.valueOf(reminderDto.getTimeTaken()));
-        viewHolder.reminder_time_total.setText(String.valueOf(reminderDto.getTimeTotal()));
+        LessionDto reminderDto = reminderDtoList.get(position);
+        viewHolder.imageView.setBackgroundResource(reminderDto.isSelected?R.drawable.gradient_red: drawable.white_grey_border);
+		viewHolder.reminder_desc.setText(reminderDto.getLessonname());
+        viewHolder.reminder_detail.setText("TBD");
+        viewHolder.reminder_time_taken.setText(String.valueOf(reminderDto.getNum()));
+        viewHolder.reminder_time_total.setText(String.valueOf(reminderDto.getLast()));
 
 		return convertView;
 	}
 
     public int getClickedNum() {
         int count = 0;
-        for(HealthReminder item : reminderDtoList)
+        for(LessionDto item : reminderDtoList)
         {
-            count += item.isSelected()?1:0;
+            count += item.isSelected?1:0;
         }
         return count;
     }

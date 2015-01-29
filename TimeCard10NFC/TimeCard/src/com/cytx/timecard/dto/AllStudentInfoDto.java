@@ -12,8 +12,7 @@ public class AllStudentInfoDto {
 
     private boolean is_training_agency;
 	private List<StudentDto> student;
-	private List<HealthStateDto> reminderstate;
-	private List<HealthStateDto> healthstate;
+	private List<TrainingDto> training;
 	private List<TeacherDto> teacher;
 	public List<StudentDto> getStudent() {
 		return student;
@@ -21,14 +20,6 @@ public class AllStudentInfoDto {
 
 	public void setStudent(List<StudentDto> student) {
 		this.student = student;
-	}
-
-	public List<HealthStateDto> getReminder() {
-		return reminderstate;
-	}
-
-	public void setReminder(List<HealthStateDto> reminder) {
-		this.reminderstate = reminder;
 	}
 
 	public List<TeacherDto> getTeacher() {
@@ -39,12 +30,19 @@ public class AllStudentInfoDto {
 		this.teacher = teacher;
 	}
 
-	public List<HealthStateDto> getHealthstate() {
-		return healthstate;
-	}
+    public boolean isIs_training_agency() {
+        return is_training_agency;
+    }
 
-	public void setHealthstate(List<HealthStateDto> healthstate) {
-		this.healthstate = healthstate;
-	}
+    public void setIs_training_agency(boolean is_training_agency) {
+        this.is_training_agency = is_training_agency;
+    }
 
+    public List<TrainingDto> getTraining() {
+        return training;
+    }
+
+    public void setTraining(List<TrainingDto> training) {
+        this.training = training;
+    }
 }
