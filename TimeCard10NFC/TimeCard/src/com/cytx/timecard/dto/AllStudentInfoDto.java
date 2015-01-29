@@ -10,8 +10,9 @@ import java.util.List;
  */
 public class AllStudentInfoDto {
 
+    private boolean is_training_agency;
 	private List<StudentDto> student;
-	//private List<ReminderDto> reminder;
+	private List<HealthStateDto> reminderstate;
 	private List<HealthStateDto> healthstate;
 	private List<TeacherDto> teacher;
 	public List<StudentDto> getStudent() {
@@ -22,13 +23,13 @@ public class AllStudentInfoDto {
 		this.student = student;
 	}
 
-//	public List<ReminderDto> getReminder() {
-//		return reminder;
-//	}
-//
-//	public void setReminder(List<ReminderDto> reminder) {
-//		this.reminder = reminder;
-//	}
+	public List<HealthStateDto> getReminder() {
+		return reminderstate;
+	}
+
+	public void setReminder(List<HealthStateDto> reminder) {
+		this.reminderstate = reminder;
+	}
 
 	public List<TeacherDto> getTeacher() {
 		return teacher;
