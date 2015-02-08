@@ -67,7 +67,8 @@ public class Utils {
 		} catch (IllegalAccessException e) {
 			e.printStackTrace();
 		} catch (NoSuchFieldException e) {
-			e.printStackTrace();
+//			e.printStackTrace();
+            DebugClass.displayCurrentStack("Exception happen: NoSuchFieldException                                                           ");
 		}
 		return BitmapFactory.decodeFile(path, opts);
 	}

@@ -556,27 +556,27 @@ public class MainActivity extends Activity implements OnClickListener {
         List<HealthReminder>list=new ArrayList<HealthReminder>();
         HealthReminder reminder=new HealthReminder();
         reminder.setReminder("咳嗽");
-        reminder.setId(131);
+        reminder.setId("131");
         reminder.setSelected(false);
 
         HealthReminder reminder1=new HealthReminder();
         reminder1.setReminder("发烧");
-        reminder.setId(132);
+        reminder.setId("132");
         reminder1.setSelected(false);
 
         HealthReminder reminder2=new HealthReminder();
         reminder2.setReminder("咽痛");
-        reminder.setId(133);
+        reminder.setId("133");
         reminder2.setSelected(false);
 
         HealthReminder reminder3=new HealthReminder();
         reminder3.setReminder("流涕");
-        reminder.setId(134);
+        reminder.setId("134");
         reminder3.setSelected(false);
 
         HealthReminder reminder4=new HealthReminder();
         reminder4.setReminder("腹泻");
-        reminder.setId(135);
+        reminder.setId("135");
         reminder4.setSelected(false);
 
         list.add(reminder);
