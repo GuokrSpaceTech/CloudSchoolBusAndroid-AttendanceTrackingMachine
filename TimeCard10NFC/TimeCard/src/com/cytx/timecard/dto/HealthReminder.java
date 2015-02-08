@@ -33,7 +33,7 @@ public class HealthReminder {
         this.isSelected = isSelected;
     }
 
-    public String getDetailedInfo() { return "教师：毛毛 状态：正常";
+    public String getDetailedInfo() { return "Teacher Mao: "+timeTaken+"/"+timeTotal;
     }
 
     public int getTimeTaken() {

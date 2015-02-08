@@ -1,5 +1,7 @@
 package com.cytx.timecard.dto;
 
+import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
 
 /**
@@ -10,7 +12,7 @@ import java.util.List;
  */
 public class AllStudentInfoDto {
 
-    private boolean is_training_agency;
+    private int is_training_agency;
 	private List<StudentDto> student;
 	private List<TrainingDto> training;
 	private List<TeacherDto> teacher;
@@ -30,11 +32,11 @@ public class AllStudentInfoDto {
 		this.teacher = teacher;
 	}
 
-    public boolean isIs_training_agency() {
+    public int isIs_training_agency() {
         return is_training_agency;
     }
 
-    public void setIs_training_agency(boolean is_training_agency) {
+    public void setIs_training_agency(int is_training_agency) {
         this.is_training_agency = is_training_agency;
     }
 
@@ -44,5 +46,21 @@ public class AllStudentInfoDto {
 
     public void setTraining(List<TrainingDto> training) {
         this.training = training;
+    }
+
+    public List<LessionDto> getAllStudentLessons()
+    {
+        HashMap<String, LessionDto> lessonMaps = new HashMap<String, LessionDto>();
+        for(TrainingDto trainingItem : training)
+        {
+            for (LessionDto lesson : trainingItem.getLesson())
+            {
+                if(!lessonMaps.containsKey(lesson.getLessonid()))
+                {
+                    lessonMaps.put(lesson.getLessonid(), lesson);
+                }
+            }
+        }
+        return (List<LessionDto>) lessonMaps.values();
     }
 }

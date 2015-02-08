@@ -26,7 +26,7 @@ import com.cytx.timecard.TimeCardApplicatoin;
 import com.cytx.timecard.MainActivity;
 import com.cytx.timecard.constants.Constants;
 import com.cytx.timecard.dto.AllStudentInfoDto;
-import com.cytx.timecard.dto.HealthStateDto;
+import com.cytx.timecard.dto.LessionDto;
 import com.cytx.timecard.dto.StudentDto;
 import com.cytx.timecard.dto.TeacherDto;
 import com.cytx.timecard.service.WebService;
@@ -65,7 +65,6 @@ public class SettingDialog extends Dialog implements OnClickListener {
     private List<StudentDto> studentList;// 所有学生的信息
 	private Map<String, StudentDto> studentMap;// 将list 转为map；
 	private AllStudentInfoDto allStudentInfoDto;
-	private List<LessionDto> reminderList; //所有的提醒
 	private List<TeacherDto> teacherList; //所有教师信息
 	private Map<String,TeacherDto>  teacherMap;
 	
@@ -234,7 +233,6 @@ public class SettingDialog extends Dialog implements OnClickListener {
 
 									studentList = allStudentInfoDto.getStudent();
 									studentMap = DataCacheTools.list2Map(studentList);
-									reminderList = (allStudentInfoDto);
 									teacherList =allStudentInfoDto.getTeacher();
 									teacherMap=DataCacheTools.list2tMap(teacherList);
 									// 将学生信息保存到本地
@@ -249,9 +247,8 @@ public class SettingDialog extends Dialog implements OnClickListener {
 									activity.studentList = studentList;
 									activity.teacherList=teacherList;
 									activity.teacherMap=teacherMap;
-									activity.reminderList=reminderList;
-									
-									//activity.reminderList = allStudentInfoDto.getHealthstate();
+
+									//activity.allStudentLessons = allStudentInfoDto.getAllStudentLessons();
 									
 									handler.sendEmptyMessage(Constants.MESSAGE_ID_UPDATE_UI);
 								}

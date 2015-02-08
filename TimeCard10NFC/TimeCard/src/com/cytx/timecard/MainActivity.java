@@ -53,8 +53,6 @@ import com.cytx.timecard.constants.Constants;
 import com.cytx.timecard.dto.AllStudentInfoDto;
 import com.cytx.timecard.dto.AvdDto;
 import com.cytx.timecard.dto.ClassInfoDto;
-import com.cytx.timecard.dto.HealthReminder;
-import com.cytx.timecard.dto.HealthStateDto;
 import com.cytx.timecard.dto.HeartPackageDto;
 import com.cytx.timecard.dto.LessionDto;
 import com.cytx.timecard.dto.RecieverDto;
@@ -149,11 +147,11 @@ public class MainActivity extends Activity implements OnClickListener {
     private TextView receiverView;
     private TextView receiverNoteView;
 
-    public List<LessionDto> currentCurriculumReminderList;
+    public List<LessionDto> currentStudentLessons;
 
     public AllStudentInfoDto allStudentInfoDto;
     public List<StudentDto> studentList; // 所有学生的信息
-    public List<LessionDto> reminderList; //所有的提醒
+    public List<LessionDto> allStudentLessons; //所有的提醒
     public int healthState = 1;
     public List<TeacherDto> teacherList; //所有教师信息
     private HeartPackageDto heartPackageDto;// 心跳包信息
@@ -196,7 +194,7 @@ public class MainActivity extends Activity implements OnClickListener {
         //初始化view控件
         initViews();
         mainHandler = new MainHandler();
-//        reminderList = loadHealthData();
+//        allStudentLessons = loadHealthData();
 //        loadHealthRemiderUI();
 
         if(!Constants.INTENT_START_ACTIVITY_ONLY.equals(getIntent().getAction()))
@@ -207,8 +205,6 @@ public class MainActivity extends Activity implements OnClickListener {
             intent.setAction(Constants.INTENT_START_SERVICE_ONLY);
             startService(intent);
         }
-
-
         else
         {
             DebugClass.displayCurrentStack("Activity launched from service, NOT start service ...");
@@ -547,10 +543,10 @@ public class MainActivity extends Activity implements OnClickListener {
 
     protected void loadRemindersUI() {
         if (remindersAdapter == null) {
-            remindersAdapter = new RemindersAdapter(getApplicationContext(), mainHandler, reminderList);
+            remindersAdapter = new RemindersAdapter(getApplicationContext(), mainHandler, allStudentLessons);
             horizontalListView_reminders.setAdapter(remindersAdapter);
         } else {
-            remindersAdapter.setReminderDtoList(reminderList);
+            remindersAdapter.setReminderDtoList(allStudentLessons);
             remindersAdapter.notifyDataSetChanged();
         }
     }
@@ -594,12 +590,12 @@ public class MainActivity extends Activity implements OnClickListener {
     {
         if(healthCheckAdapter==null)
         {
-            healthCheckAdapter=new HealthRemindersAdapter(getApplicationContext(),  mainHandler, currentCurriculumReminderList);
+            healthCheckAdapter=new HealthRemindersAdapter(getApplicationContext(),  mainHandler, currentStudentLessons);
             horizontalListView_healthcheck.setAdapter(healthCheckAdapter);
         }
         else
         {
-            healthCheckAdapter.setReminderDtoList(currentCurriculumReminderList);
+            healthCheckAdapter.setReminderDtoList(currentStudentLessons);
             healthCheckAdapter.notifyDataSetChanged();
         }
     }
@@ -708,11 +704,11 @@ public class MainActivity extends Activity implements OnClickListener {
 
                         studentList = allStudentInfoDto.getStudent();
                         studentMap = DataCacheTools.list2Map(studentList);
-                        reminderList = loadHealthData(allStudentInfoDto);
+                        allStudentLessons = loadHealthData(allStudentInfoDto);
                         teacherList = allStudentInfoDto.getTeacher();
                         teacherMap = DataCacheTools.list2tMap(teacherList);
 
-                        if (reminderList != null && reminderList.size() != 0)
+                        if (allStudentLessons != null && allStudentLessons.size() != 0)
                             loadRemindersUI();
                     }
 
@@ -742,10 +738,10 @@ public class MainActivity extends Activity implements OnClickListener {
                             if (allStudentInfoDto != null) {
                                 studentList = allStudentInfoDto.getStudent();
                                 studentMap = DataCacheTools.list2Map(studentList);
-                                reminderList = allStudentInfoDto.getHealthstate();
+                                allStudentLessons = allStudentInfoDto.getAllStudentLessons();
 
                                 //Update the reminders
-                                if (reminderList != null && reminderList.size() != 0)
+                                if (allStudentLessons != null && allStudentLessons.size() != 0)
                                     loadRemindersUI();
 
                                 // 将学生信息保存到本地
@@ -861,9 +857,9 @@ public class MainActivity extends Activity implements OnClickListener {
                                 allStudentInfoDto.setTeacher(teacherList);
 
 
-                                DebugClass.displayCurrentStack("add reminder: "+reminderList.size());
+                                DebugClass.displayCurrentStack("add reminder: " + allStudentLessons.size());
 
-                                if (reminderList != null && reminderList.size() != 0)
+                                if (allStudentLessons != null && allStudentLessons.size() != 0)
                                     loadRemindersUI();
 
                                 // 将学生信息保存到本地
@@ -894,12 +890,12 @@ public class MainActivity extends Activity implements OnClickListener {
         AttendanceStateBean attStateBean = null;
 
 
-        if (cardNum != null && reminderList != null) {
+        if (cardNum != null && allStudentLessons != null) {
             attStateBean = new AttendanceStateBean();
             StringBuilder reminders = new StringBuilder();
-            for (int i = 0; i < reminderList.size(); i++) {
-                if (reminderList.get(i).isSelected) {
-                    reminders.append(reminderList.get(i).getId()).append(",");
+            for (int i = 0; i < allStudentLessons.size(); i++) {
+                if (allStudentLessons.get(i).isSelected) {
+                    reminders.append(allStudentLessons.get(i).getLessonid()).append(",");
                 }
             }
             attStateBean.setReminder(reminders.toString());
@@ -909,9 +905,9 @@ public class MainActivity extends Activity implements OnClickListener {
             attStateBean.setCreatetime(System.currentTimeMillis() / 1000);
 
             StringBuilder healthreminders = new StringBuilder();
-            for (int i = 0; i < currentCurriculumReminderList.size(); i++) {
-                if (currentCurriculumReminderList.get(i).isSelected) {
-                    healthreminders.append(currentCurriculumReminderList.get(i).getLessonname()).append(",");
+            for (int i = 0; i < currentStudentLessons.size(); i++) {
+                if (currentStudentLessons.get(i).isSelected) {
+                    healthreminders.append(currentStudentLessons.get(i).getLessonid()).append(",");
                 }
             }
 
@@ -1219,28 +1215,28 @@ public class MainActivity extends Activity implements OnClickListener {
 
         if(healthCheckAdapter!=null)
         {
-            if(currentCurriculumReminderList !=null)
+            if(currentStudentLessons !=null)
             {
-                for (int i=0;i< currentCurriculumReminderList.size();i++)
+                for (int i=0;i< currentStudentLessons.size();i++)
                 {
-                    LessionDto health= currentCurriculumReminderList.get(i);
+                    LessionDto health= currentStudentLessons.get(i);
                     health.isSelected = false;
                 }
-                healthCheckAdapter.setReminderDtoList(currentCurriculumReminderList);
+                healthCheckAdapter.setReminderDtoList(currentStudentLessons);
                 healthCheckAdapter.notifyDataSetChanged();
             }
         }
 
         if(remindersAdapter!=null)
         {
-            if(reminderList!=null)
+            if(allStudentLessons !=null)
             {
-                for (int i=0;i<reminderList.size();i++)
+                for (int i=0;i< allStudentLessons.size();i++)
                 {
-                    LessionDto dto=reminderList.get(i);
+                    LessionDto dto= allStudentLessons.get(i);
                     dto.isSelected = false;
                 }
-                remindersAdapter.setReminderDtoList(reminderList);
+                remindersAdapter.setReminderDtoList(allStudentLessons);
                 remindersAdapter.notifyDataSetChanged();
 
             }
@@ -1478,7 +1474,7 @@ public class MainActivity extends Activity implements OnClickListener {
                 StudentDto studentDto = (StudentDto) currentObject;
                 loadStudentInfoUI(studentDto);
                 loadReceiverInfoUI(studentDto);
-                currentCurriculumReminderList = loadCurriculum(allStudentInfoDto, cardNum);
+                currentStudentLessons = loadCurriculum(allStudentInfoDto, cardNum);
                 loadHealthRemiderUI();                takePic();
 
             } else if (currentObject instanceof TeacherDto) {
