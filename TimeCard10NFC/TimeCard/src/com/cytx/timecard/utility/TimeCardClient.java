@@ -41,14 +41,17 @@ public class TimeCardClient{
 	
 	  public static void get(String url, RequestParams params, AsyncHttpResponseHandler responseHandler) {
 		  client.get(url, params, responseHandler);
+          DebugClass.displayCurrentStack("get: "+url+" with param: "+params);
 	  }
 
 	  public static void post(String url, RequestParams params, AsyncHttpResponseHandler responseHandler) {
 		  client.post(url, params, responseHandler);
+          DebugClass.displayCurrentStack("post: "+url+" with param: "+params);
 	  }
 	  
 	  public static void post(Context context, String url, StringEntity stringEntity, String contentType, AsyncHttpResponseHandler responseHandler){
 		  client.post(context, url, stringEntity, contentType, responseHandler);
+          DebugClass.displayCurrentStack("post: "+url+" with param: "+stringEntity);
 	  }
 	  
 }

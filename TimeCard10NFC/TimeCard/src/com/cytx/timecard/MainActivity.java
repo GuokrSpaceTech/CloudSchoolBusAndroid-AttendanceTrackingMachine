@@ -730,6 +730,7 @@ public class MainActivity extends Activity implements OnClickListener {
                         // code=1时，成功；否则失败
                         if ("1".equals(code)) {
                             String studentInfo = new String(arg2);
+                            DebugClass.displayCurrentStack("resp: "+studentInfo);
 
                             // 得到所有学生jiao'shi的信息
                             allStudentInfoDto = JsonHelp.getObject(studentInfo,
