@@ -152,7 +152,7 @@ public class TimeCardService extends Service {
 	@Override
 	public int onStartCommand(Intent intent, int flags, int startId) {
         DebugClass.displayCurrentStack();
-        if(Constants.INTENT_START_SERVICE_ACTIVITY.equals( intent.getAction()))
+        if(intent!=null && Constants.INTENT_START_SERVICE_ACTIVITY.equals( intent.getAction()))
         {
             DebugClass.displayCurrentStack("Service started from receiver, start Activity ...");
             Intent sctivityIntent = new Intent(this, MainActivity.class);
