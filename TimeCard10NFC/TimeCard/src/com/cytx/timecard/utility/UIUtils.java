@@ -152,7 +152,7 @@ public class UIUtils {
 	public static void showToastPunchCardCode(String code, Context context){
 		
 		if ("1".equals(code)) {
-			showToast(context, "打卡成功", "Clock in success");
+			showToast(context, "打卡成功", "Check in success");
 			return ;
 		}
 		

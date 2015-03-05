@@ -2,6 +2,8 @@ package com.cytx.timecard.service;
 
 import com.cytx.timecard.bean.AttendanceStateBean;
 import com.cytx.timecard.bean.TimeCardBean;
+import com.cytx.timecard.lbs.BusStopDto;
+import com.cytx.timecard.lbs.LocationUpdateMsg;
 import com.loopj.android.http.AsyncHttpResponseHandler;
 
 /**
@@ -20,11 +22,21 @@ public interface WebService {
 	// 获取心跳包信息
 	void getHeartPackageInfo(String machine, AsyncHttpResponseHandler asynchttpresponsehandler);
 	
-	// 学生考勤打卡
+	// 获取心跳包信息
+	void postLocationUpdate(LocationUpdateMsg locationUpdate, AsyncHttpResponseHandler asynchttpresponsehandler);
+	
+	// 学生考勤打卡	
 	void timeCardInfo(TimeCardBean timeCardBean, AsyncHttpResponseHandler asynchttpresponsehandler);
 	
 	// 获取广告图片
 	void getAvdPicture(AsyncHttpResponseHandler asynchttpresponsehandler);
 
-	void postReminderHealthState(AttendanceStateBean attStateBean, AsyncHttpResponseHandler asynchttpresponsehandler);
+    public void postReminderHealthState(AttendanceStateBean attStateBean,
+                                        AsyncHttpResponseHandler asynchttpresponsehandler) ;
+
+	//获取站点列表
+	public void getBusStopList(String machineid, AsyncHttpResponseHandler asynchttpresponsehandler);
+
+	//通知到站信息
+	void postBusStopArrival(int busStopId, String mid, Long timestamp, AsyncHttpResponseHandler asynchttpresponsehandler);
 }

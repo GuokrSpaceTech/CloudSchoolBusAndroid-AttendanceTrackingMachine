@@ -26,7 +26,9 @@ import android.os.Parcelable;
 import android.os.PowerManager;
 import android.text.Editable;
 import android.text.TextWatcher;
+import android.util.DisplayMetrics;
 import android.util.Log;
+import android.view.Display;
 import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
@@ -47,6 +49,11 @@ import android.widget.ProgressBar;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
+import com.baidu.location.BDLocation;
+import com.baidu.location.BDLocationListener;
+import com.baidu.location.BDNotifyListener;
+import com.baidu.location.LocationClient;
+import com.baidu.location.LocationClientOption;
 import com.cytx.timecard.bean.AttendanceStateBean;
 import com.cytx.timecard.bean.TimeCardBean;
 import com.cytx.timecard.constants.Constants;
@@ -61,6 +68,8 @@ import com.cytx.timecard.dto.SmartCardInfoDto;
 import com.cytx.timecard.dto.StudentDto;
 import com.cytx.timecard.dto.TeacherDto;
 import com.cytx.timecard.jdbc.DataBaseUtils;
+import com.cytx.timecard.lbs.BusStopDto;
+import com.cytx.timecard.lbs.BusStopListDto;
 import com.cytx.timecard.service.TimeCardService;
 import com.cytx.timecard.service.WebService;
 import com.cytx.timecard.service.impl.WebServiceImpl;
@@ -155,6 +164,7 @@ public class MainActivity extends Activity implements OnClickListener {
     public int healthState = 1;
     public List<TeacherDto> teacherList; //所有教师信息
     private HeartPackageDto heartPackageDto;// 心跳包信息
+	public List<BusStopDto> busStopList;
     private AvdDto avdDto;// 广告信息
     private String cardNum;// 卡号
     private String base64;// 图片信息
@@ -167,7 +177,8 @@ public class MainActivity extends Activity implements OnClickListener {
 
     private SoundPool sp;
     private int soundId;
-
+	private LocationClient mLocationClient;
+	private NotifyLister mNotifyLister;
     // 自定义TextView替换toast的功能：目的是缩短提示信息显示的时间
     private TextView toastTextView;
     private ToastThread toastThread;
@@ -462,6 +473,9 @@ public class MainActivity extends Activity implements OnClickListener {
         loadRemindersUI();
         loadHealthRemiderUI();
 
+        // 获取站点列表
+        if(!isPad()) getBusStopList();
+        
         // 下载广告图片
         downloadAvdPicture();
 
@@ -1138,6 +1152,8 @@ public class MainActivity extends Activity implements OnClickListener {
         public void handleMessage(Message msg) {
             super.handleMessage(msg);
             switch (msg.what) {
+			case Constants.MESSAGE_LOCATION_UPDATE:
+				break;
                 // 收到消息就跳转到广告界面
                 case Constants.MESSAGE_30:
                     mainToAdvSwap();
@@ -1558,6 +1574,7 @@ public class MainActivity extends Activity implements OnClickListener {
         WindowManager windowManager = (WindowManager) this
                 .getSystemService(Context.WINDOW_SERVICE);
         windowManager.removeView(toastTextView);
+        if(!isPad()) stopLBS();
     }
 
     @Override
@@ -1650,4 +1667,171 @@ public class MainActivity extends Activity implements OnClickListener {
 
         closeCamera();
     }
+
+    @Override
+    protected void onStart() {
+        if(!isPad()) startLBS();
+        super.onStart();
+    }
+
+    private void getBusStopList()
+    {
+		WebService webService = WebServiceImpl.getInstance();
+		webService.getBusStopList(Utils.getMachineNum(this),new AsyncHttpResponseHandler() {
+
+			@Override
+			public void onFinish() {
+				super.onFinish();
+			}
+
+			@Override
+			public void onStart() {
+				super.onStart();
+			}
+
+			@Override
+			public void onFailure(int arg0, Header[] arg1, byte[] arg2,
+					Throwable arg3) {
+				if (arg3 != null) {
+					UIUtils.showToastSererError(arg3, getApplicationContext());
+				}
+			}
+
+			@Override
+			public void onSuccess(int arg0, Header[] arg1, byte[] arg2) {
+//				cancelTimeOperation();
+//				Map<String, String> maps = new HashMap<String, String>();
+//
+//				if (arg1 != null && arg1.length != 0) {
+//
+//					for (int i = 0; i < arg1.length; i++) {
+//						maps.put(arg1[i].getName(), arg1[i].getValue());
+//					}
+//				}
+
+				String result = new String(arg2);
+			    BusStopListDto busStopList = JsonHelp.getObject(result, BusStopListDto.class);
+				if(busStopList!=null)
+				{
+				    List<BusStopDto> list = busStopList.getGeofence();
+				    int i;
+				    for(i=0; i<list.size(); i++ )
+				    {
+				    	BusStopDto busStop = list.get(i);
+				    	
+				        mNotifyLister = new NotifyLister(busStop);
+					    //mNotifyLister.SetNotifyLocation(39.962026, 116.439021, 3000, "bd09ll");//4个参数代表要位置提醒的点的坐标，具体含义依次为：纬度，经度，距离范围，坐标系类型(gcj02,gps,bd09,bd09ll)
+					    mNotifyLister.SetNotifyLocation(busStop.getLatitude(), busStop.getLongitude(), 500, "bd09ll");//4个参数代表要位置提醒的点的坐标，具体含义依次为：纬度，经度，距离范围，坐标系类型(gcj02,gps,bd09,bd09ll)
+				        mLocationClient.registerNotify(mNotifyLister);
+				    }
+				    
+				    if( i > 0)
+				    {
+				    	mLocationClient.start();
+				    }
+				}
+			
+			}
+		});
+    }
+    
+	private void startLBS(){
+	    mLocationClient = ((TimeCardApplicatoin)getApplication()).mLocationClient;
+	  
+        LocationClientOption option = new LocationClientOption();
+	    option.setLocationMode(LocationClientOption.LocationMode.Hight_Accuracy);//设置定位模式
+	    option.setCoorType("bd09ll");//返回的定位结果是百度经纬度，默认值gcj02
+	    int span=20*1000;
+	    option.setScanSpan(span);//设置发起定位请求的间隔时间为5000ms
+	    option.setIsNeedAddress(false);
+        mLocationClient.setLocOption(option);
+      
+        //This is a Must-have, otherwise there will be Null pointer error
+        mLocationClient.registerLocationListener(new NotiftLocationListener());
+	  
+	}
+	
+	private void stopLBS()
+	{
+		mLocationClient.removeNotifyEvent(mNotifyLister);
+		mLocationClient.stop();
+	}
+	
+	public void notifyServerBusStop(BusStopDto busStop)
+	{	
+		WebService webService = WebServiceImpl.getInstance();
+		webService.postBusStopArrival(busStop.getGeofenceid(), 
+				                      Utils.getMachineNum(this), 
+				                      System.currentTimeMillis()/1000, 
+				                      new AsyncHttpResponseHandler() {
+			@Override
+			public void onFinish() {
+				super.onFinish();
+			}
+
+			@Override
+			public void onStart() {
+				super.onStart();
+			}
+
+			@Override
+			public void onFailure(int arg0, Header[] arg1, byte[] arg2,
+					Throwable arg3) {
+				if (arg3 != null) {
+					UIUtils.showToastSererError(arg3, getApplicationContext());
+				}
+			}
+
+			@Override
+			public void onSuccess(int arg0, Header[] arg1, byte[] arg2) {
+			}
+		});
+	}
+
+	public class NotiftLocationListener implements BDLocationListener {
+
+		@Override
+		public void onReceiveLocation(BDLocation location) {
+			//Receive Location 
+			//double longitude = location.getLongitude();
+			//double latitude = location.getLatitude();
+		}
+	}
+	
+	public class NotifyLister extends BDNotifyListener {
+		
+		BusStopDto mBusStop;
+		
+		public NotifyLister(BusStopDto busStop)
+		{
+			mBusStop = busStop;
+		}
+		
+	    public void onNotify(BDLocation mlocation, float distance){
+	    	//Toast.makeText(NotifyActivity.this, "震动提醒", Toast.LENGTH_SHORT).show();
+	    	//Log.i("","Location Deteced!");
+	    	notifyServerBusStop(mBusStop);
+	    }
+	}
+
+    private boolean isPad() {
+        WindowManager wm = (WindowManager) getSystemService(Context.WINDOW_SERVICE);
+        Display display = wm.getDefaultDisplay();
+        // 屏幕宽度
+        float screenWidth = display.getWidth();
+        // 屏幕高度
+        float screenHeight = display.getHeight();
+        DisplayMetrics dm = new DisplayMetrics();
+        display.getMetrics(dm);
+        double x = Math.pow(dm.widthPixels / dm.xdpi, 2);
+        double y = Math.pow(dm.heightPixels / dm.ydpi, 2);
+        // 屏幕尺寸
+        double screenInches = Math.sqrt(x + y);
+        // 大于6尺寸则为Pad
+        if (screenInches >= 6.0) {
+            return true;
+        }
+        return false;
+    }
+
 }

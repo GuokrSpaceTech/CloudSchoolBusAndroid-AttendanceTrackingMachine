@@ -3,8 +3,11 @@ package com.cytx.timecard.service.impl;
 import com.cytx.timecard.bean.AttendanceStateBean;
 import com.cytx.timecard.bean.TimeCardBean;
 import com.cytx.timecard.constants.Constants;
+import com.cytx.timecard.lbs.BusStopDto;
+import com.cytx.timecard.lbs.LocationUpdateMsg;
 import com.cytx.timecard.service.WebService;
 import com.cytx.timecard.utility.TimeCardClient;
+import com.cytx.timecard.utility.Utils;
 import com.loopj.android.http.AsyncHttpResponseHandler;
 import com.loopj.android.http.RequestParams;
 
@@ -72,6 +75,44 @@ public class WebServiceImpl implements WebService {
 		TimeCardClient.get(Constants.AVD_PICTURE_URL, params, asynchttpresponsehandler);
 	}
 	
+		/**
+	 * 上传位置信息
+	 */
+	@Override
+	public void postLocationUpdate(LocationUpdateMsg locationUpdate,
+			AsyncHttpResponseHandler asynchttpresponsehandler) {
+		RequestParams params = new RequestParams();
+		params.put("machine", locationUpdate.getMachine());
+		params.put("createtime", locationUpdate.getCreatetime());
+		params.put("latitude", locationUpdate.getLatitude());
+		params.put("longitude", locationUpdate.getLongitude());
+		TimeCardClient.post(Constants.LOC_UPDATE_URL, params, asynchttpresponsehandler);	
+	}
+	
+	/**
+	 * 获取站点列表
+	 */
+	@Override
+	public void getBusStopList(String machineid, 
+			AsyncHttpResponseHandler asynchttpresponsehandler) {
+		RequestParams params = new RequestParams();
+		TimeCardClient.get(Constants.BUS_STOP_LIST_URL+"/mid/"+machineid, params, asynchttpresponsehandler);
+	}
+	
+	/**
+	 * 通知服务器到达站点附近
+	 */
+	@Override
+	public void postBusStopArrival(int busStopId, String mid, Long timestamp,
+			AsyncHttpResponseHandler asynchttpresponsehandler)
+	{
+		RequestParams params = new RequestParams();
+		params.put("createtime", timestamp);
+		params.put("geoid", busStopId);
+		params.put("mid", mid);
+		TimeCardClient.post(Constants.BUS_STOP_ARRIVAL_NOTICE, params, asynchttpresponsehandler);
+	}
+
 	/**
 	 * Upload Reminders
 	 * && HealthState

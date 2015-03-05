@@ -7,26 +7,31 @@ import android.content.SharedPreferences.Editor;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.content.pm.PackageManager.NameNotFoundException;
-import android.database.sqlite.SQLiteDatabase;
 import android.graphics.Bitmap;
 
+import com.baidu.location.LocationClient;
 import com.nostra13.universalimageloader.cache.memory.impl.WeakMemoryCache;
 import com.nostra13.universalimageloader.core.DisplayImageOptions;
 import com.nostra13.universalimageloader.core.ImageLoader;
 import com.nostra13.universalimageloader.core.ImageLoaderConfiguration;
 import com.nostra13.universalimageloader.core.assist.ImageScaleType;
 
+
 /**
  * 创建时间：2014年7月30日 下午2:09:25 项目名称：TimeCard
  * 
  * @author ben
  * @version 1.0 文件名称：TimeCardApplicatoin.java 类说明：自定义Application
+ * Copyright 2014 Beijing Guokrspace Technology Co.,Ltd 
  */
 public class TimeCardApplicatoin extends Application {
 
 	private static TimeCardApplicatoin app;
-//	private SQLiteDatabase db;
-//	private DatabaseHelper databaseHelper;
+	//private SQLiteDatabase db;
+	//private DatabaseHelper databaseHelper;
+	public LocationClient mLocationClient;
+	//public GeofenceClient mGeofenceClient = null;
+	//public MyLocationListener mMyLocationListener;
 
 	@Override
 	public void onCreate() {
@@ -42,6 +47,14 @@ public class TimeCardApplicatoin extends Application {
 		app = this;
 //		DatabaseHelper databaseHelper = new DatabaseHelper(this);
 //		db = databaseHelper.open();
+		
+		mLocationClient = new LocationClient(this.getApplicationContext());
+//		mMyLocationListener = new MyLocationListener();
+//		mLocationClient.registerLocationListener(mMyLocationListener);
+		
+		//mGeofenceClient = new GeofenceClient(this.getApplicationContext());
+		//mGeofenceClient.registerGeofenceTriggerListener(new GeofenceEnterListener());
+		//mGeofenceClient.start();
 	}
 
 	public static TimeCardApplicatoin getInstance() {
@@ -137,5 +150,66 @@ public class TimeCardApplicatoin extends Application {
 		
 	}
 
-
+//	/**
+//	 * 实现实位回调监听
+//	 */
+//	public class MyLocationListener implements BDLocationListener {
+//
+//		@Override
+//		public void onReceiveLocation(BDLocation location) {
+//			//Receive Location 
+//			String machine = Utils.getMachineNum(getApplicationContext());
+//			String createtime = location.getTime();
+//			SimpleDateFormat formatter = new SimpleDateFormat("yyyy-mm-dd hh:mm:ss");
+//			Date date = null;
+//			try {
+//				date = (Date)formatter.parse(createtime);
+//			} catch (ParseException e) {
+//				e.printStackTrace();
+//			}
+//			int timestamp = (int) (date.getTime()/1000);
+//			double longitude = location.getLongitude();
+//			double latitude  = location.getLatitude();
+//			LocationUpdateMsg locationUpdate = new LocationUpdateMsg();
+//			locationUpdate.setCreatetime(timestamp);
+//			locationUpdate.setLongitude(longitude);
+//			locationUpdate.setMachine(machine);
+//			locationUpdate.setLatitude(latitude);
+//			
+//			locationUpdate(locationUpdate);
+//		}
+//	}
+//	
+//	// 更新位置信息
+//	private void locationUpdate(LocationUpdateMsg locationUpdate) {
+//		
+//		WebService webService = WebServiceImpl.getInstance();
+//		webService.postLocationUpdate(locationUpdate,
+//				new AsyncHttpResponseHandler() {
+//
+//					@Override
+//					public void onFinish() {
+//						super.onFinish();
+//					}
+//
+//					@Override
+//					public void onStart() {
+//						super.onStart();
+//					}
+//
+//					@Override
+//					public void onFailure(int arg0, Header[] arg1, byte[] arg2,
+//							Throwable arg3) {
+//						if (arg3 != null) {
+//							UIUtils.showToastSererError(arg3,
+//									getApplicationContext());
+//						}
+//					}
+//
+//					@Override
+//					public void onSuccess(int arg0, Header[] arg1, byte[] arg2) {
+//						// 隔30秒更新
+//					}
+//				});
+//	}
 }

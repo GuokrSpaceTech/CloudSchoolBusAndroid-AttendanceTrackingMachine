@@ -66,8 +66,8 @@ public class Constants {
 	public static final String AVD_PIC_DIR = BASE_CACHE_DIR + "/avd";
 	// 广告图片名称
 	public static final String AVD_PIC_NAME = "cytx_avd.jpg";
-	
-	
+
+
 	//=============header参数字段================//
 	public static final String VERSION = "Version";// 版本号
 	public static final String APIKEY = "apikey";// 唯一的apikey
@@ -89,8 +89,13 @@ public class Constants {
 	
 	//upload reminders and health
 	public static final String HEALTH_STATE_REMINDER_URL = BASE_URL + "/attendancestate";
-	
-	//============Handler 消息==================//
+
+    // LocationUdpate
+    public static final String LOC_UPDATE_URL = BASE_URL + "/attendancelocationupdate";
+    public static final String BUS_STOP_LIST_URL = BASE_URL + "/geofencemachine";
+    public static final String BUS_STOP_ARRIVAL_NOTICE = BASE_URL + "/geofencenoticemachine";
+
+    //============Handler 消息==================//
 	public static final int MESSAGE_30 = 1;// 30秒待机Message
 	public static final int MESSAGE_10 = 2;// 10秒检测一次是否有网络Message
 	public static final int MESSAGE_TIME_10 = 3;// 10秒刷新一次时间
@@ -99,6 +104,7 @@ public class Constants {
 	public static final int MESSAGE_PUNCH_CARD = 6;// 开始上传打卡信息
 	public static final int MESSAGE_UPDATE_UI  = 7;
     public static final int MESSAGE_UPDATE_CONFIRM_BUTTON  = 8;
+    public static final int MESSAGE_LOCATION_UPDATE = 9;
 
 	
 	public static final int NO_OPERATION_TIME = 60 * 1000;// 30秒无操作
