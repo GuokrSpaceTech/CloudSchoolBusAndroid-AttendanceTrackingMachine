@@ -19,7 +19,8 @@
     <uses-permission android:name="android.permission.FLASHLIGHT" />
     <uses-permission android:name="android.permission.CAMERA" />
     <uses-permission android:name="android.permission.NFC" />
-    
+    <uses-permission android:name="android.permission.WRITE_SETTINGS" />
+
     <uses-feature android:name="android.hardware.nfc" />
     <uses-feature android:name="android.hardware.camera" />
     <uses-feature android:name="android.hardware.camera.autofocus" />
@@ -34,6 +35,9 @@
         <meta-data
             android:name="UMENG_APPKEY"
             android:value="53e30583fd98c539e202401b" />
+        <meta-data
+            android:name="com.baidu.lbsapi.API_KEY"
+            android:value="GY9wDXahmwI4BvbPgcrEeZ6C" />
         <meta-data
             android:name="UMENG_CHANNEL"
             android:value="Channel ID" />

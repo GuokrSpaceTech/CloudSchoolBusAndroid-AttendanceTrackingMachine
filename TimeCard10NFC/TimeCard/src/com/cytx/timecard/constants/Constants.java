@@ -1,5 +1,7 @@
 package com.cytx.timecard.constants;
 
+import android.app.Activity;
+
 import com.cytx.timecard.utility.FileTools;
 
 /**
@@ -15,6 +17,8 @@ public class Constants {
     public static final String LAST_RUN_VERSION = "last_run_version";
     // TODO confirm below line whenever change version in manifest.xml
     public static final boolean IS_API_CHANGED_FROM_LAST_VERSION = true;
+    public static final boolean DEBUG_MODE_ON = false;
+    public static final int LIGHTNESS_AVD = 0;
     // 是否需要版本更新
 	public static boolean IS_NEED_UPDATE = false;
 	

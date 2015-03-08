@@ -78,6 +78,7 @@ import com.cytx.timecard.utility.DateTools;
 import com.cytx.timecard.utility.DebugClass;
 import com.cytx.timecard.utility.FileTools;
 import com.cytx.timecard.utility.JsonHelp;
+import com.cytx.timecard.utility.LightnessControl;
 import com.cytx.timecard.utility.UIUtils;
 import com.cytx.timecard.utility.Utils;
 import com.cytx.timecard.widget.HealthRemindersAdapter;
@@ -136,7 +137,6 @@ public class MainActivity extends Activity implements OnClickListener {
     private RemindersAdapter remindersAdapter;
 
     private ImageView confirmImageView;
-    private boolean hasReminders;
     private Button infoButton;
 
     // right-bottom
@@ -185,6 +185,7 @@ public class MainActivity extends Activity implements OnClickListener {
 
     private NfcAdapter mAdapter;
     private PendingIntent mPendingIntent;
+    private int oldLightNess = 255;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -1586,7 +1587,7 @@ public class MainActivity extends Activity implements OnClickListener {
         if (isCameraRunning)
             return;
         else {
-            camera = Camera.open(Camera.CameraInfo.CAMERA_FACING_FRONT); // Turn on the camera
+            camera = Camera.open(isPad()?Camera.CameraInfo.CAMERA_FACING_FRONT: CameraInfo.CAMERA_FACING_BACK); // Turn on the camera
 
             try {
                 camera.setPreviewDisplay(surfaceHolder); // Set Preview
@@ -1651,6 +1652,8 @@ public class MainActivity extends Activity implements OnClickListener {
     }
 
     private void advToMainSwap() {
+        LightnessControl.SetLightness(this, oldLightNess);
+
         advRelativeLayout.setVisibility(View.GONE);
 
         mainRelativeLayout.setVisibility(View.VISIBLE);
@@ -1666,6 +1669,13 @@ public class MainActivity extends Activity implements OnClickListener {
         mainRelativeLayout.setVisibility(View.GONE);
 
         closeCamera();
+
+        if(LightnessControl.isAutoBrightness(this))
+        {
+            LightnessControl.stopAutoBrightness(this);
+        }
+        oldLightNess = LightnessControl.GetLightness(this);
+        LightnessControl.SetLightness(this, Constants.LIGHTNESS_AVD);
     }
 
     @Override
@@ -1682,16 +1692,21 @@ public class MainActivity extends Activity implements OnClickListener {
 			@Override
 			public void onFinish() {
 				super.onFinish();
+                DebugClass.displayCurrentStack();
 			}
 
 			@Override
 			public void onStart() {
 				super.onStart();
+                DebugClass.displayCurrentStack();
 			}
 
 			@Override
 			public void onFailure(int arg0, Header[] arg1, byte[] arg2,
 					Throwable arg3) {
+                cancelTimeOperation();
+                loadingLinearLayout.setVisibility(View.GONE);
+                DebugClass.displayCurrentStack();
 				if (arg3 != null) {
 					UIUtils.showToastSererError(arg3, getApplicationContext());
 				}
@@ -1699,7 +1714,9 @@ public class MainActivity extends Activity implements OnClickListener {
 
 			@Override
 			public void onSuccess(int arg0, Header[] arg1, byte[] arg2) {
-//				cancelTimeOperation();
+				cancelTimeOperation();
+                DebugClass.displayCurrentStack();
+                loadingLinearLayout.setVisibility(View.GONE);
 //				Map<String, String> maps = new HashMap<String, String>();
 //
 //				if (arg1 != null && arg1.length != 0) {
