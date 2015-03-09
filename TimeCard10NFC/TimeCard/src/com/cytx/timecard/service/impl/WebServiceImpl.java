@@ -126,6 +126,7 @@ public class WebServiceImpl implements WebService {
 		params.put("reminder", attStateBean.getReminder());
 		params.put("isnormal", attStateBean.getHealthState());
 		params.put("createtime", attStateBean.getCreatetime());
+        params.put("healthreminder", attStateBean.getHealthReminder());
 		TimeCardClient.post(Constants.HEALTH_STATE_REMINDER_URL, params, asynchttpresponsehandler);
 	}
 
