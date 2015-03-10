@@ -1715,23 +1715,13 @@ public class MainActivity extends Activity implements OnClickListener {
 				cancelTimeOperation();
                 DebugClass.displayCurrentStack();
                 loadingLinearLayout.setVisibility(View.GONE);
-//				Map<String, String> maps = new HashMap<String, String>();
-//
-//				if (arg1 != null && arg1.length != 0) {
-//
-//					for (int i = 0; i < arg1.length; i++) {
-//						maps.put(arg1[i].getName(), arg1[i].getValue());
-//					}
-//				}
 
 				String result = new String(arg2);
 			    BusStopListDto busStopList = JsonHelp.getObject(result, BusStopListDto.class);
-				if(busStopList!=null)
-				{
+				if(busStopList!=null){
 				    List<BusStopDto> list = busStopList.getGeofence();
 				    int i;
-				    for(i=0; i<list.size(); i++ )
-				    {
+				    for(i=0; i<list.size(); i++ ){
 				    	BusStopDto busStop = list.get(i);
 				    	
 				        mNotifyLister = new NotifyLister(busStop);
@@ -1740,11 +1730,16 @@ public class MainActivity extends Activity implements OnClickListener {
 				        mLocationClient.registerNotify(mNotifyLister);
 				    }
 				    
-				    if( i > 0)
-				    {
+				    if( list.size() > 0){
 				    	mLocationClient.start();
 				    }
+                    else{
+                        DebugClass.displayCurrentStack("get zero bus stop: "+ result);
+                    }
 				}
+                else{
+                    DebugClass.displayCurrentStack("get error bus stop resp: "+ result);
+                }
 			
 			}
 		});
@@ -1792,6 +1787,7 @@ public class MainActivity extends Activity implements OnClickListener {
 			@Override
 			public void onFailure(int arg0, Header[] arg1, byte[] arg2,
 					Throwable arg3) {
+                DebugClass.displayCurrentStack("fail: BusStopArrival");
 				if (arg3 != null) {
 					UIUtils.showToastSererError(arg3, getApplicationContext());
 				}
@@ -1799,6 +1795,7 @@ public class MainActivity extends Activity implements OnClickListener {
 
 			@Override
 			public void onSuccess(int arg0, Header[] arg1, byte[] arg2) {
+                DebugClass.displayCurrentStack("success: BusStopArrival");
 			}
 		});
 	}
@@ -1825,6 +1822,7 @@ public class MainActivity extends Activity implements OnClickListener {
 	    public void onNotify(BDLocation mlocation, float distance){
 	    	//Toast.makeText(NotifyActivity.this, "震动提醒", Toast.LENGTH_SHORT).show();
 	    	//Log.i("","Location Deteced!");
+            DebugClass.displayCurrentStack("run to location: "+mlocation.getAddrStr()+"("+mBusStop.getGeofenceid()+") distance: "+distance);
 	    	notifyServerBusStop(mBusStop);
 	    }
 	}
