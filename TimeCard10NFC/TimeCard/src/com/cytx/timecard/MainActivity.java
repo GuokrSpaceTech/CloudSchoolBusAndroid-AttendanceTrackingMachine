@@ -474,8 +474,9 @@ public class MainActivity extends Activity implements OnClickListener {
         loadRemindersUI();
         loadHealthRemiderUI();
 
-        // 获取站点列表
-        if(!isPad()) getBusStopList();
+        // TODO need to recover if need to diff pad and cell
+//        if(!isPad())
+            getBusStopList();
         
         // 下载广告图片
         downloadAvdPicture();
@@ -1315,6 +1316,7 @@ public class MainActivity extends Activity implements OnClickListener {
             @Override
             public void onFailure(int arg0, Header[] arg1, byte[] arg2,
                                   Throwable arg3) {
+                DebugClass.displayCurrentStack();
             }
 
             @Override
@@ -1329,9 +1331,14 @@ public class MainActivity extends Activity implements OnClickListener {
                 // 获取header中参数Code的值
                 String code = maps.get("Code");
                 // code=1时，成功；否则失败
-                if ("1".equals(code)) {
+                if ("1".equals(code))
+                {
                     showTextViewToast("记录成功！", "Reminders Captured");
                     clearReminderUI();
+                }
+                else
+                {
+                    DebugClass.displayCurrentStack();
                 }
             }
         });
@@ -1457,10 +1464,13 @@ public class MainActivity extends Activity implements OnClickListener {
                     break;
                 }
                 AttendanceStateBean attState = this.composeAttendanceStateBean();
-                if (attState != null && (attState.getReminder() != "" ))
+                if (attState != null && (attState.getReminder() != "" )) {
                     UploadAttState(attState);
+                }
                 else
+                {
                     showTextViewToast("默认状态！", "Default Status");
+                }
                 break;
             //取消
             default:
@@ -1680,7 +1690,9 @@ public class MainActivity extends Activity implements OnClickListener {
 
     @Override
     protected void onStart() {
-        if(!isPad()) startLBS();
+        //TODO need to recover if need to diff pad and cell phone
+//        if(!isPad())
+            startLBS();
         super.onStart();
     }
 
@@ -1848,7 +1860,10 @@ public class MainActivity extends Activity implements OnClickListener {
         if (screenInches >= 6.0) {
             return true;
         }
-        return false;
+
+        //TODO this shall be recovered, if we need to diff pad and cell phone
+//        return false;
+        return true;
     }
 
 }
