@@ -963,7 +963,7 @@ public class MainActivity extends Activity implements OnClickListener {
                 {
                     if (reminder.isSelected)  healthreminders.append(reminder.getId()).append(",");
                 }
-                attStateBean.setHealthState(reminderList.size()==0?0:1);
+                attStateBean.setHealthState(reminderList.size()==0?1:0);
                 attStateBean.setHealthReminder(healthreminders.toString());
             }
         }
