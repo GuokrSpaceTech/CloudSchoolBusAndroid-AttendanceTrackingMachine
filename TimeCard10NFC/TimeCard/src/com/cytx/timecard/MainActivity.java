@@ -161,7 +161,6 @@ public class MainActivity extends Activity implements OnClickListener {
     public AllStudentInfoDto allStudentInfoDto;
     public List<StudentDto> studentList; // 所有学生的信息
     public List<HealthStateDto> reminderList; //所有的提醒
-    public int healthState = 1;
     public List<TeacherDto> teacherList; //所有教师信息
     private HeartPackageDto heartPackageDto;// 心跳包信息
 	public List<BusStopDto> busStopList;
@@ -940,46 +939,33 @@ public class MainActivity extends Activity implements OnClickListener {
     private AttendanceStateBean composeAttendanceStateBean() {
         AttendanceStateBean attStateBean = null;
 
-
-        if (cardNum != null && (healthReminderList != null || reminderList!=null)) {
+        if (cardNum != null && (healthReminderList != null || reminderList!=null))
+        {
             attStateBean = new AttendanceStateBean();
-            StringBuffer reminders = new StringBuffer();
-            if(healthReminderList != null)
-            {
-                for (int i = 0; i < healthReminderList.size(); i++) {
-                    if (healthReminderList.get(i).isSelected) {
-                        reminders.append(healthReminderList.get(i).getId()).append(",");
-                    }
-                }
-            }
-            attStateBean.setReminder(reminders.toString());
-            attStateBean.setHealthState(healthState);
             attStateBean.setCardid(cardNum);
             attStateBean.setMid(Utils.getMachineNum(this));
             attStateBean.setCreatetime(System.currentTimeMillis() / 1000);
 
-            StringBuffer healthreminders = new StringBuffer();
+            if(healthReminderList != null)
+            {
+                StringBuffer reminders = new StringBuffer();
+                for (HealthReminder health : healthReminderList)
+                {
+                    if (health.isSelected)  reminders.append(health.getId()).append(",");
+                }
+                attStateBean.setReminder(reminders.toString());
+            }
+
             if(reminderList != null)
             {
-                for (int i = 0; i < reminderList.size(); i++) {
-                    if (reminderList.get(i).isSelected) {
-                        healthreminders.append(reminderList.get(i).getId()).append(",");
-                    }
+                StringBuffer healthreminders = new StringBuffer();
+                for (HealthStateDto reminder : reminderList)
+                {
+                    if (reminder.isSelected)  healthreminders.append(reminder.getId()).append(",");
                 }
+                attStateBean.setHealthState(reminderList.size()==0?0:1);
+                attStateBean.setHealthReminder(healthreminders.toString());
             }
-
-            if(healthreminders.toString().equals(""))
-            {
-                attStateBean.setHealthState(0);
-            }
-            else
-            {
-                attStateBean.setHealthState(1);
-            }
-
-
-            attStateBean.setHealthReminder(healthreminders.toString());
-
         }
 
         return attStateBean;
