@@ -105,7 +105,7 @@ public class Utils {
         DebugClass.displayCurrentStack("mac: "+szWLANMAC);
         if(Constants.DEBUG_MODE_ON)
         {
-            return "30e96523eb91"; // TODO: you can change it to a working mac for testing
+            return "706b40603f02"; // TODO: you can change it to a working mac for testing
         }
         else
         {

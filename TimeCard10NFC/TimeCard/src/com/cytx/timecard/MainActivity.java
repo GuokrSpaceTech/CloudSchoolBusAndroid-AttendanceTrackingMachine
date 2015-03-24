@@ -963,7 +963,7 @@ public class MainActivity extends Activity implements OnClickListener {
                 {
                     if (reminder.isSelected)  healthreminders.append(reminder.getId()).append(",");
                 }
-                attStateBean.setHealthState(reminderList.size()==0?1:0);
+                attStateBean.setHealthState(healthreminders.length()==0?1:0);
                 attStateBean.setHealthReminder(healthreminders.toString());
             }
         }
@@ -1487,7 +1487,8 @@ public class MainActivity extends Activity implements OnClickListener {
 
             cardNum = getNFCTagId(tag);
 
-         //   cardNum = "76968361323170";
+            if(Constants.DEBUG_MODE_ON)
+                cardNum = "36094815406330116";
 
             cardTextView.setText("卡号：\n" + cardNum);
 
