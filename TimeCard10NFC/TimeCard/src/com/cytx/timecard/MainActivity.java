@@ -162,7 +162,6 @@ public class MainActivity extends Activity implements OnClickListener {
     public AllStudentInfoDto allStudentInfoDto;
     public List<StudentDto> studentList; // 所有学生的信息
     public List<HealthStateDto> reminderList; //所有的提醒
-    public int healthState = 1;
     public List<TeacherDto> teacherList; //所有教师信息
     private HeartPackageDto heartPackageDto;// 心跳包信息
 	public List<BusStopDto> busStopList;
@@ -475,8 +474,9 @@ public class MainActivity extends Activity implements OnClickListener {
         loadRemindersUI();
         loadHealthRemiderUI();
 
-        // 获取站点列表
-        if(!isPad()) getBusStopList();
+        // TODO need to recover if need to diff pad and cell
+//        if(!isPad())
+            getBusStopList();
         
         // 下载广告图片
         downloadAvdPicture();
@@ -940,46 +940,33 @@ public class MainActivity extends Activity implements OnClickListener {
     private AttendanceStateBean composeAttendanceStateBean() {
         AttendanceStateBean attStateBean = null;
 
-
-        if (cardNum != null && (healthReminderList != null || reminderList!=null)) {
+        if (cardNum != null && (healthReminderList != null || reminderList!=null))
+        {
             attStateBean = new AttendanceStateBean();
-            StringBuffer reminders = new StringBuffer();
-            if(healthReminderList != null)
-            {
-                for (int i = 0; i < healthReminderList.size(); i++) {
-                    if (healthReminderList.get(i).isSelected) {
-                        reminders.append(healthReminderList.get(i).getId()).append(",");
-                    }
-                }
-            }
-            attStateBean.setReminder(reminders.toString());
-            attStateBean.setHealthState(healthState);
             attStateBean.setCardid(cardNum);
             attStateBean.setMid(Utils.getMachineNum(this));
             attStateBean.setCreatetime(System.currentTimeMillis() / 1000);
 
-            StringBuffer healthreminders = new StringBuffer();
+            if(healthReminderList != null)
+            {
+                StringBuffer reminders = new StringBuffer();
+                for (HealthReminder health : healthReminderList)
+                {
+                    if (health.isSelected)  reminders.append(health.getId()).append(",");
+                }
+                attStateBean.setReminder(reminders.toString());
+            }
+
             if(reminderList != null)
             {
-                for (int i = 0; i < reminderList.size(); i++) {
-                    if (reminderList.get(i).isSelected) {
-                        healthreminders.append(reminderList.get(i).getId()).append(",");
-                    }
+                StringBuffer healthreminders = new StringBuffer();
+                for (HealthStateDto reminder : reminderList)
+                {
+                    if (reminder.isSelected)  healthreminders.append(reminder.getId()).append(",");
                 }
+                attStateBean.setHealthState(healthreminders.length()==0?1:0);
+                attStateBean.setHealthReminder(healthreminders.toString());
             }
-
-            if(healthreminders.toString().equals(""))
-            {
-                attStateBean.setHealthState(0);
-            }
-            else
-            {
-                attStateBean.setHealthState(1);
-            }
-
-
-            attStateBean.setHealthReminder(healthreminders.toString());
-
         }
 
         return attStateBean;
@@ -1316,6 +1303,7 @@ public class MainActivity extends Activity implements OnClickListener {
             @Override
             public void onFailure(int arg0, Header[] arg1, byte[] arg2,
                                   Throwable arg3) {
+                DebugClass.displayCurrentStack();
             }
 
             @Override
@@ -1330,9 +1318,14 @@ public class MainActivity extends Activity implements OnClickListener {
                 // 获取header中参数Code的值
                 String code = maps.get("Code");
                 // code=1时，成功；否则失败
-                if ("1".equals(code)) {
+                if ("1".equals(code))
+                {
                     showTextViewToast("记录成功！", "Reminders Captured");
                     clearReminderUI();
+                }
+                else
+                {
+                    DebugClass.displayCurrentStack();
                 }
             }
         });
@@ -1458,10 +1451,13 @@ public class MainActivity extends Activity implements OnClickListener {
                     break;
                 }
                 AttendanceStateBean attState = this.composeAttendanceStateBean();
-                if (attState != null && (attState.getReminder() != "" ))
+                if (attState != null && (attState.getReminder() != "" )) {
                     UploadAttState(attState);
+                }
                 else
+                {
                     showTextViewToast("默认状态！", "Default Status");
+                }
                 break;
             //取消
             default:
@@ -1492,7 +1488,8 @@ public class MainActivity extends Activity implements OnClickListener {
 
             cardNum = getNFCTagId(tag);
 
-         //   cardNum = "76968361323170";
+            if(Constants.DEBUG_MODE_ON)
+                cardNum = "36094815406330116";
 
             cardTextView.setText("卡号：\n" + cardNum);
 
@@ -1683,7 +1680,9 @@ public class MainActivity extends Activity implements OnClickListener {
 
     @Override
     protected void onStart() {
-        if(!isPad()) startLBS();
+        //TODO need to recover if need to diff pad and cell phone
+//        if(!isPad())
+            startLBS();
         super.onStart();
     }
 
@@ -1720,23 +1719,13 @@ public class MainActivity extends Activity implements OnClickListener {
 				cancelTimeOperation();
                 DebugClass.displayCurrentStack();
                 loadingLinearLayout.setVisibility(View.GONE);
-//				Map<String, String> maps = new HashMap<String, String>();
-//
-//				if (arg1 != null && arg1.length != 0) {
-//
-//					for (int i = 0; i < arg1.length; i++) {
-//						maps.put(arg1[i].getName(), arg1[i].getValue());
-//					}
-//				}
 
 				String result = new String(arg2);
 			    BusStopListDto busStopList = JsonHelp.getObject(result, BusStopListDto.class);
-				if(busStopList!=null)
-				{
+				if(busStopList!=null){
 				    List<BusStopDto> list = busStopList.getGeofence();
 				    int i;
-				    for(i=0; i<list.size(); i++ )
-				    {
+				    for(i=0; i<list.size(); i++ ){
 				    	BusStopDto busStop = list.get(i);
 				    	
 				        mNotifyLister = new NotifyLister(busStop);
@@ -1745,11 +1734,16 @@ public class MainActivity extends Activity implements OnClickListener {
 				        mLocationClient.registerNotify(mNotifyLister);
 				    }
 				    
-				    if( i > 0)
-				    {
+				    if( list.size() > 0){
 				    	mLocationClient.start();
 				    }
+                    else{
+                        DebugClass.displayCurrentStack("get zero bus stop: "+ result);
+                    }
 				}
+                else{
+                    DebugClass.displayCurrentStack("get error bus stop resp: "+ result);
+                }
 			
 			}
 		});
@@ -1797,6 +1791,7 @@ public class MainActivity extends Activity implements OnClickListener {
 			@Override
 			public void onFailure(int arg0, Header[] arg1, byte[] arg2,
 					Throwable arg3) {
+                DebugClass.displayCurrentStack("fail: BusStopArrival");
 				if (arg3 != null) {
 					UIUtils.showToastSererError(arg3, getApplicationContext());
 				}
@@ -1804,6 +1799,7 @@ public class MainActivity extends Activity implements OnClickListener {
 
 			@Override
 			public void onSuccess(int arg0, Header[] arg1, byte[] arg2) {
+                DebugClass.displayCurrentStack("success: BusStopArrival");
 			}
 		});
 	}
@@ -1830,6 +1826,7 @@ public class MainActivity extends Activity implements OnClickListener {
 	    public void onNotify(BDLocation mlocation, float distance){
 	    	//Toast.makeText(NotifyActivity.this, "震动提醒", Toast.LENGTH_SHORT).show();
 	    	//Log.i("","Location Deteced!");
+            DebugClass.displayCurrentStack("run to location: "+mlocation.getAddrStr()+"("+mBusStop.getGeofenceid()+") distance: "+distance);
 	    	notifyServerBusStop(mBusStop);
 	    }
 	}
@@ -1851,7 +1848,10 @@ public class MainActivity extends Activity implements OnClickListener {
         if (screenInches >= 6.0) {
             return true;
         }
-        return false;
+
+        //TODO this shall be recovered, if we need to diff pad and cell phone
+//        return false;
+        return true;
     }
 
 }
