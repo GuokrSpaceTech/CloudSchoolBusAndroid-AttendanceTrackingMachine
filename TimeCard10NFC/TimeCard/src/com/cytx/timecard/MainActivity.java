@@ -87,6 +87,7 @@ import com.cytx.timecard.widget.ReceiverAdapter;
 import com.cytx.timecard.widget.RemindersAdapter;
 import com.cytx.timecard.widget.SettingDialog;
 import com.loopj.android.http.AsyncHttpResponseHandler;
+import com.umeng.analytics.MobclickAgent;
 import com.umeng.update.UmengUpdateAgent;
 import com.umeng.update.UmengUpdateListener;
 import com.umeng.update.UpdateResponse;
@@ -1559,6 +1560,7 @@ public class MainActivity extends Activity implements OnClickListener {
         if (mAdapter != null) {
             mAdapter.enableForegroundDispatch(this, mPendingIntent, null, null);
         }
+        MobclickAgent.onResume(this);
     }
 
     @Override
@@ -1567,6 +1569,7 @@ public class MainActivity extends Activity implements OnClickListener {
         if (mAdapter != null) {
             mAdapter.disableForegroundDispatch(this);
         }
+        MobclickAgent.onPause(this);
     }
 
     @Override
