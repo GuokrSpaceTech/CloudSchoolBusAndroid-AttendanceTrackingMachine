@@ -1,0 +1,2 @@
+include ':DaoDBGenerator'
+project(':DaoDBGenerator').projectDir = new File('DaoDBGenerator')

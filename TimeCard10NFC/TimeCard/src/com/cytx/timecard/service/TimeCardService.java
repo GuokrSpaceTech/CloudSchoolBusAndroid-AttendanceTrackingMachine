@@ -5,6 +5,7 @@ import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import android.annotation.SuppressLint;
@@ -13,8 +14,12 @@ import android.content.Intent;
 import android.os.Handler;
 import android.os.IBinder;
 
+import com.cytx.timecard.TimeCardApplicatoin;
 import com.cytx.timecard.bean.TimeCardBean;
 import com.cytx.timecard.constants.Constants;
+import com.cytx.timecard.database.DaoSession;
+import com.cytx.timecard.database.TimeRecordEntity;
+import com.cytx.timecard.database.TimeRecordEntityDao;
 import com.cytx.timecard.service.impl.WebServiceImpl;
 import com.cytx.timecard.utility.DataCacheTools;
 import com.cytx.timecard.utility.DateTools;
@@ -40,8 +45,9 @@ public class TimeCardService extends Service {
 	private File noUploadCardFile [] ;// 没有上传打卡信息的文件
 	private final int TIME_NETWORK_EVERY = 10 * 1000;// 10秒钟检测网络状态
 	private final int TIME_PUNCH_CARD_EVERY = 10 * 1000;// 10秒上传一条打卡数据
-	private File currentFile;// 当前上传成功的文件
-	
+
+	private final static int MSG_UPLOAD_TIMERECORD = 2;
+	private final static int MSG_CLEAR_LOCALDATA = 1;
 	@SuppressLint("HandlerLeak")
 	private Handler handler = new Handler(){
 		public void handleMessage(android.os.Message msg) {
@@ -50,17 +56,16 @@ public class TimeCardService extends Service {
 			case 1:
 				if (count < TIME_12_H) {
 					count += 60 * 1000;
-					handler.sendEmptyMessageDelayed(1, TIME_CLEAR_EVERY);
+					handler.sendEmptyMessageDelayed(MSG_CLEAR_LOCALDATA, TIME_CLEAR_EVERY);
 				} else {
 					try {
-						// 清除数据
-						DataCacheTools.clearCacheDatas();
+						// Todo 清除Old数据
 					} catch (Exception e) {
 
 					}
 					// 将计时器复原
 					count = 0;
-					handler.sendEmptyMessage(1);
+					handler.sendEmptyMessage(MSG_CLEAR_LOCALDATA);
 				}
 				
 				break;
@@ -69,48 +74,26 @@ public class TimeCardService extends Service {
 			case 2:
 				// 如果有网络，那么上传打卡信息
 				if (Utils.checkNetworkInfo(TimeCardService.this)) {
-					File fileDir = new File(Constants.CARD_INFO_DIR_NO);
-					// 存在目录文件
-					if (fileDir != null && fileDir.exists()) {
-						noUploadCardFile = fileDir.listFiles();
-						// 文件夹为空
-						if (noUploadCardFile == null || noUploadCardFile.length == 0) {
-							// 继续检测
-							handler.sendEmptyMessageDelayed(2, TIME_NETWORK_EVERY);					
-						}
-						// 文件夹不为空，开始上传
-						else {
-							// flag默认为true，表示所有的文件都是以warn开头命名的
-							// flag为false，表示有的文件不是以warn开头命名的，那么上传此文件
-							boolean flag = true;
-							for (int i = 0; i < noUploadCardFile.length; i++) {
-								// 如果有文件不是以warn开头命名的，那么上传此文件
-								if (!noUploadCardFile[i].getName().startsWith("warn")) {
-									flag = false;
-									currentFile = noUploadCardFile[i];
-									break;
-								}
-							}
-							// 如果都是以warn开头命名的，那么直接取第一个文件即可
-							if (flag) {
-								currentFile = noUploadCardFile[0];
-							}
-							
-							// 读取打卡信息
-							String cardData = getCardData(currentFile);
-							// 转换为TimeCardBean对象
-							TimeCardBean timeCardBean = getTimeCardBean(cardData);
-							// 开始打卡信息
-							punchCard(timeCardBean);
-						}
-					} else {
-						// 若还没有未上传的文件，那么继续检测
-						handler.sendEmptyMessageDelayed(2, TIME_NETWORK_EVERY);
+					DaoSession dbSession = TimeCardApplicatoin.getInstance().mDaoSession;
+					List<TimeRecordEntity> timeRecordEntities = dbSession.getTimeRecordEntityDao().loadAll();
+					for(TimeRecordEntity timeRecord:timeRecordEntities)
+					{
+						TimeCardBean bean = new TimeCardBean();
+						bean.setMachine(timeRecord.getMachine());
+						bean.setHealthstate(timeRecord.getHealthstate());
+						bean.setFext(timeRecord.getFext());
+						bean.setCreatetime(timeRecord.getCreatetime());
+						bean.setFbody(timeRecord.getFbody());
+						bean.setSmartid(timeRecord.getCardid());
+						bean.setTemperature(timeRecord.getTemperature());
+						punchCard(bean);
 					}
+
+					handler.sendEmptyMessageDelayed(MSG_UPLOAD_TIMERECORD, TIME_NETWORK_EVERY);
 				}
 				// 如果没有网络，那么隔继续检测
 				else {
-					handler.sendEmptyMessageDelayed(2, TIME_NETWORK_EVERY);
+					handler.sendEmptyMessageDelayed(MSG_UPLOAD_TIMERECORD, TIME_NETWORK_EVERY);
 				}
 				break;
 			}
@@ -127,9 +110,9 @@ public class TimeCardService extends Service {
 	public void onCreate() {
 		super.onCreate();
 		// 检测是否需要清除已上传打卡数据
-		handler.sendEmptyMessage(1);
+		handler.sendEmptyMessage(MSG_CLEAR_LOCALDATA);
 		// 检测有网时，就上传打卡信息
-		handler.sendEmptyMessage(2);
+		handler.sendEmptyMessage(MSG_UPLOAD_TIMERECORD);
 	}
 
 	@Override
@@ -167,7 +150,6 @@ public class TimeCardService extends Service {
 	
 	/**
 	 * 获取TimeCardBean
-	 * @param jsonString
 	 * @return
 	 */
 	private TimeCardBean getTimeCardBean(String cardData){
@@ -182,14 +164,14 @@ public class TimeCardService extends Service {
 
 			@Override
 			public void onFailure(int arg0, org.apache.http.Header[] arg1,
-					byte[] arg2, Throwable arg3) {
+								  byte[] arg2, Throwable arg3) {
 				// 重新检测是否有网络
 				handler.sendEmptyMessageDelayed(2, TIME_PUNCH_CARD_EVERY);
 			}
 
 			@Override
 			public void onSuccess(int arg0, org.apache.http.Header[] arg1,
-					byte[] arg2) {
+								  byte[] arg2) {
 				Map<String, String> maps = new HashMap<String, String>();
 
 				if (arg1 != null && arg1.length != 0) {
@@ -204,37 +186,22 @@ public class TimeCardService extends Service {
 				//System.out.println(code);
 				// 说明上传打卡信息成功：code=1
 				if (code != null && "1".equals(code)) {
-				//if (arg0 == 200) {
-				    // 上传成功，remove files
-					removeFileUpload(timeCardBean);
 					// 间隔1秒再上传下条打卡数据
-					handler.sendEmptyMessageDelayed(2, 1000);
+					DaoSession dbSession = TimeCardApplicatoin.getInstance().mDaoSession;
+					List<TimeRecordEntity> timeRecordEntities =
+							dbSession.getTimeRecordEntityDao().queryBuilder()
+									.where(TimeRecordEntityDao.Properties.Createtime.eq(timeCardBean.getCreatetime()))
+									.limit(1).list();
+					if (timeRecordEntities.size() == 1) {
+						dbSession.getTimeRecordEntityDao().delete(timeRecordEntities.get(0));
+					}
+
+					handler.sendEmptyMessageDelayed(MSG_UPLOAD_TIMERECORD, 1000);
 				} else {
 					// 重新检测是否有网络
-					moveFile2Fail(timeCardBean);
-					handler.sendEmptyMessage(2);
-				}			
+					handler.sendEmptyMessage(MSG_UPLOAD_TIMERECORD);
+				}
 			}
 		});
-	}
-
-
-	/**
-	 * 移动文件：打卡信息
-	 */
-	private void removeFileUpload(TimeCardBean timeCardBean){
-		currentFile.delete();
-	}
-	
-	private void moveFile2Fail(TimeCardBean timeCardBean)
-	{
-		File newFileDir = new File(Constants.CARD_INFO_DIR_FAIL);
- 		if (!newFileDir.exists()) {
- 			newFileDir.mkdirs();
- 		}
-
- 		String newFileName = currentFile.getName();
-
- 		currentFile.renameTo(new File(newFileDir, newFileName));
 	}
 }

@@ -57,6 +57,10 @@ import com.baidu.location.LocationClientOption;
 import com.cytx.timecard.bean.AttendanceStateBean;
 import com.cytx.timecard.bean.TimeCardBean;
 import com.cytx.timecard.constants.Constants;
+import com.cytx.timecard.database.CardEntity;
+import com.cytx.timecard.database.DaoSession;
+import com.cytx.timecard.database.StudentEntity;
+import com.cytx.timecard.database.TimeRecordEntity;
 import com.cytx.timecard.dto.AllStudentInfoDto;
 import com.cytx.timecard.dto.AvdDto;
 import com.cytx.timecard.dto.ClassInfoDto;
@@ -93,7 +97,7 @@ import com.umeng.update.UmengUpdateListener;
 import com.umeng.update.UpdateResponse;
 import com.umeng.update.UpdateStatus;
 
-import org.apache.http.Header;
+import org.apache.http.*;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -762,6 +766,34 @@ public class MainActivity extends Activity implements OnClickListener {
                                         Constants.STUDENT_INFO_DIR,
                                         Constants.STUDENT_INFO_FILE_NAME,
                                         studentInfo);
+
+                                //Save Student into DB
+                                DaoSession dbSession = TimeCardApplicatoin.getInstance().mDaoSession;
+                                if(dbSession!=null)
+                                {
+                                    for(StudentDto studentDto:studentList) {
+                                        StudentEntity student = new StudentEntity();
+                                        student.setStudentid(studentDto.getStudentid());
+                                        student.setAvatar(studentDto.getAvatar());
+                                        student.setCnnname(studentDto.getCnname());
+                                        student.setSchoolname(studentDto.getSchoolname());
+                                        student.setPid(studentDto.getPid());
+                                        //Class Name
+                                        if(studentDto.getClassinfo().size()>0) {
+                                            String classname = studentDto.getClassinfo().get(0).getClassname();
+                                            student.setClassname(classname);
+                                        }
+                                        //Card Numbers
+                                        for(SmartCardInfoDto smartCardInfoDto:studentDto.getSmartcardinfo()) {
+                                            CardEntity cardEntity = new CardEntity();
+                                            cardEntity.setCardnumber(smartCardInfoDto.getCardid());
+                                            cardEntity.setStudentid(student.getStudentid());
+                                            dbSession.getCardEntityDao().insert(cardEntity);
+                                        }
+
+                                        dbSession.getStudentEntityDao().insert(student);
+                                    }
+                                }
                             }
                             else
                             {
@@ -1211,6 +1243,17 @@ public class MainActivity extends Activity implements OnClickListener {
                     TimeCardBean tmcardBean = (TimeCardBean) msg.obj;
                     String cardData = JsonHelp.jsonObjectToString(tmcardBean);
 
+                    DaoSession dbSession = TimeCardApplicatoin.getInstance().mDaoSession;
+                    TimeRecordEntity timeRecordEntity = new TimeRecordEntity();
+                    timeRecordEntity.setCardid(tmcardBean.getSmartid());
+                    timeRecordEntity.setCreatetime(tmcardBean.getCreatetime());
+                    timeRecordEntity.setFbody(tmcardBean.getFbody());
+                    timeRecordEntity.setFext(tmcardBean.getFext());
+                    timeRecordEntity.setHealthstate(tmcardBean.getHealthstate());
+                    timeRecordEntity.setMachine(tmcardBean.getMachine());
+                    timeRecordEntity.setTemperature(tmcardBean.getTemperature());
+                    dbSession.getTimeRecordEntityDao().insert(timeRecordEntity);
+
                     // 文件名称：yyMMddHHmmss+cardid+.dto
                     FileTools.save2SDCard(Constants.CARD_INFO_DIR_NO,
                             DateTools.getDateForm("yyMMddHHmmss", System.currentTimeMillis()) + tmcardBean.getSmartid() + ".dto",
@@ -1489,7 +1532,7 @@ public class MainActivity extends Activity implements OnClickListener {
             cardNum = getNFCTagId(tag);
 
             if(Constants.DEBUG_MODE_ON)
-                cardNum = "36094815406330116";
+                cardNum = "1234567890";
 
             cardTextView.setText("卡号：\n" + cardNum);
 
@@ -1587,9 +1630,8 @@ public class MainActivity extends Activity implements OnClickListener {
         if (isCameraRunning)
             return;
         else {
-            camera = Camera.open(isPad()?Camera.CameraInfo.CAMERA_FACING_FRONT: CameraInfo.CAMERA_FACING_BACK); // Turn on the camera
-
             try {
+                camera = Camera.open(isPad()?Camera.CameraInfo.CAMERA_FACING_FRONT: CameraInfo.CAMERA_FACING_BACK); // Turn on the camera
                 camera.setPreviewDisplay(surfaceHolder); // Set Preview
                 Camera.Parameters parameters = camera.getParameters(); // Camera
                 CameraInfo info = new CameraInfo();

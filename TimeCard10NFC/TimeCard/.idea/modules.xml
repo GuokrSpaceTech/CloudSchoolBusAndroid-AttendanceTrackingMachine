@@ -2,8 +2,8 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
+      <module fileurl="file://$PROJECT_DIR$/DaoDBGenerator/DaoDBGenerator.iml" filepath="$PROJECT_DIR$/DaoDBGenerator/DaoDBGenerator.iml" />
       <module fileurl="file://$PROJECT_DIR$/TimeCard.iml" filepath="$PROJECT_DIR$/TimeCard.iml" />
     </modules>
   </component>
 </project>
-

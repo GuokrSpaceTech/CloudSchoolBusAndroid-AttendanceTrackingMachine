@@ -17,7 +17,7 @@ public class Constants {
     public static final String LAST_RUN_VERSION = "last_run_version";
     // TODO confirm below line whenever change version in manifest.xml
     public static final boolean IS_API_CHANGED_FROM_LAST_VERSION = true;
-    public static final boolean DEBUG_MODE_ON = false;
+    public static final boolean DEBUG_MODE_ON = true;
     public static final int LIGHTNESS_AVD = 0;
     // 是否需要版本更新
 	public static boolean IS_NEED_UPDATE = false;
@@ -81,7 +81,7 @@ public class Constants {
 //	public static final String BASE_URL = "http://124.64.109.181:81/";
 //	public static final String BASE_URL = "http://222.128.71.186:81/";
 //	public static final String BASE_URL = "http://apitest.yunxiaoche.com/";
-	public static final String BASE_URL = "http://api35.yunxiaoche.com:81/";
+	public static final String BASE_URL = "http://api36.yunxiaoche.com/api/attendance";
 	// 下载所有的学生信息
 	public static final String SCHOOL_STUDENT_URL = BASE_URL + "/nfcallinfo";
 	// 下载心跳包信息

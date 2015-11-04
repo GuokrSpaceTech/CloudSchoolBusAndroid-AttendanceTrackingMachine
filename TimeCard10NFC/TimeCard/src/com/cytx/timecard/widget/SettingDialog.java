@@ -25,8 +25,13 @@ import com.cytx.timecard.R;
 import com.cytx.timecard.TimeCardApplicatoin;
 import com.cytx.timecard.MainActivity;
 import com.cytx.timecard.constants.Constants;
+import com.cytx.timecard.database.CardEntity;
+import com.cytx.timecard.database.DaoSession;
+import com.cytx.timecard.database.ParentsEntity;
+import com.cytx.timecard.database.StudentEntity;
 import com.cytx.timecard.dto.AllStudentInfoDto;
 import com.cytx.timecard.dto.HealthStateDto;
+import com.cytx.timecard.dto.SmartCardInfoDto;
 import com.cytx.timecard.dto.StudentDto;
 import com.cytx.timecard.dto.TeacherDto;
 import com.cytx.timecard.service.WebService;
@@ -135,29 +140,29 @@ public class SettingDialog extends Dialog implements OnClickListener {
 		UmengUpdateAgent.setUpdateListener(new UmengUpdateListener() {
 			@Override
 			public void onUpdateReturned(int updateStatus,
-					UpdateResponse updateInfo) {
+										 UpdateResponse updateInfo) {
 				switch (updateStatus) {
-				case UpdateStatus.Yes: // has update
-					UmengUpdateAgent.showUpdateDialog(context,
-							updateInfo);
-					Constants.IS_NEED_UPDATE = true;
-					break;
-				case UpdateStatus.No: // has no update
-					UIUtils.showToast(context,
-							"太棒了，你使用是已是最新版本！",
-							"Great, you are using the latest version!");
-					Constants.IS_NEED_UPDATE = false;
-					updateImageView.setVisibility(View.GONE);
-					break;
-				case UpdateStatus.NoneWifi: // none wifi
-					UIUtils.showToast(context,
-							"没有wifi连接，只在wifi下更新！",
-							"No wifi connection, only update on wifi!");
-					break;
-				case UpdateStatus.Timeout: // time out
-					UIUtils.showToast(context, "亲，你的网络不给力哦！",
-							"Pro, the network signal is bad!");
-					break;
+					case UpdateStatus.Yes: // has update
+						UmengUpdateAgent.showUpdateDialog(context,
+								updateInfo);
+						Constants.IS_NEED_UPDATE = true;
+						break;
+					case UpdateStatus.No: // has no update
+						UIUtils.showToast(context,
+								"太棒了，你使用是已是最新版本！",
+								"Great, you are using the latest version!");
+						Constants.IS_NEED_UPDATE = false;
+						updateImageView.setVisibility(View.GONE);
+						break;
+					case UpdateStatus.NoneWifi: // none wifi
+						UIUtils.showToast(context,
+								"没有wifi连接，只在wifi下更新！",
+								"No wifi connection, only update on wifi!");
+						break;
+					case UpdateStatus.Timeout: // time out
+						UIUtils.showToast(context, "亲，你的网络不给力哦！",
+								"Pro, the network signal is bad!");
+						break;
 				}
 			}
 		});
@@ -242,6 +247,36 @@ public class SettingDialog extends Dialog implements OnClickListener {
 											Constants.STUDENT_INFO_DIR,
 											Constants.STUDENT_INFO_FILE_NAME,
 											studentInfo);
+
+									//Save Student into DB
+									DaoSession dbSession = TimeCardApplicatoin.getInstance().mDaoSession;
+									dbSession.getStudentEntityDao().deleteAll(); //Clear old data
+									if(dbSession!=null)
+									{
+										for(StudentDto studentDto:studentList) {
+											StudentEntity student = new StudentEntity();
+											student.setStudentid(studentDto.getStudentid());
+											student.setAvatar(studentDto.getAvatar());
+											student.setCnnname(studentDto.getCnname());
+											student.setSchoolname(studentDto.getSchoolname());
+											student.setPid(studentDto.getPid());
+											//Class Name
+											if(studentDto.getClassinfo().size()>0) {
+												String classname = studentDto.getClassinfo().get(0).getClassname();
+												student.setClassname(classname);
+											}
+											//Card Numbers
+											for(SmartCardInfoDto smartCardInfoDto:studentDto.getSmartcardinfo()) {
+												CardEntity cardEntity = new CardEntity();
+												cardEntity.setCardnumber(smartCardInfoDto.getCardid());
+												cardEntity.setStudentid(student.getStudentid());
+												dbSession.getCardEntityDao().insert(cardEntity);
+											}
+
+											dbSession.getStudentEntityDao().insert(student);
+										}
+									}
+
 									
 									MainActivity activity = (MainActivity) context;
 									activity.allStudentInfoDto = allStudentInfoDto;
