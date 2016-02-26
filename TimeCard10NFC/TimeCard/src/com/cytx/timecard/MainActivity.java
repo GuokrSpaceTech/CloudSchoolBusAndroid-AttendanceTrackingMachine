@@ -378,8 +378,7 @@ public class MainActivity extends Activity implements OnClickListener {
 
                     // 得到当前刷卡学生的信息
                     Object currentObject = getCurrentInfo(cardNum);
-                    if(currentObject==null)
-                    {
+                    if (currentObject == null) {
                         clearUI();
                         showTextViewToast("此卡不存在！", "Card is not exist!");
                         return;
@@ -636,10 +635,12 @@ public class MainActivity extends Activity implements OnClickListener {
                 StudentDto studentdto = studentlist.get(i);
                 List<SmartCardInfoDto> smartcardinfolist = studentdto.getSmartcardinfo();
 
-                for (int j = 0; j < smartcardinfolist.size(); j++) {
-                    SmartCardInfoDto smartcardinfo = smartcardinfolist.get(j);
-                    if (cardNum.equals(smartcardinfo.getCardid())) {
-                        return studentdto;
+                if(smartcardinfolist!=null) {
+                    for (int j = 0; j < smartcardinfolist.size(); j++) {
+                        SmartCardInfoDto smartcardinfo = smartcardinfolist.get(j);
+                        if (cardNum.equals(smartcardinfo.getCardid())) {
+                            return studentdto;
+                        }
                     }
                 }
             }
@@ -653,10 +654,12 @@ public class MainActivity extends Activity implements OnClickListener {
                 TeacherDto teacherdto = teacherlist.get(i);
                 List<SmartCardInfoDto> smartcardinfolist = teacherdto.getSmartcardinfo();
 
-                for (int j = 0; j < smartcardinfolist.size(); j++) {
-                    SmartCardInfoDto smartcardinfo = smartcardinfolist.get(j);
-                    if (cardNum.equals(smartcardinfo.getCardid())) {
-                        return teacherdto;
+                if(smartcardinfolist!=null) {
+                    for (int j = 0; j < smartcardinfolist.size(); j++) {
+                        SmartCardInfoDto smartcardinfo = smartcardinfolist.get(j);
+                        if (cardNum.equals(smartcardinfo.getCardid())) {
+                            return teacherdto;
+                        }
                     }
                 }
             }
