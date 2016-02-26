@@ -1631,7 +1631,7 @@ public class MainActivity extends Activity implements OnClickListener {
             return;
         else {
             try {
-                camera = Camera.open(isPad()?Camera.CameraInfo.CAMERA_FACING_FRONT: CameraInfo.CAMERA_FACING_BACK); // Turn on the camera
+                camera = Camera.open(isPad()?Camera.CameraInfo.CAMERA_FACING_BACK: CameraInfo.CAMERA_FACING_BACK); // Turn on the camera
                 camera.setPreviewDisplay(surfaceHolder); // Set Preview
                 Camera.Parameters parameters = camera.getParameters(); // Camera
                 CameraInfo info = new CameraInfo();

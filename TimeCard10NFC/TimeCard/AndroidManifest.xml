@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="com.cytx.timecard"
-    android:versionCode="12"
+    android:versionCode="16"
     android:versionName="3.4.7" >
 
     <uses-sdk
@@ -34,7 +34,7 @@
         android:label="@string/app_name" >
         <meta-data
             android:name="UMENG_APPKEY"
-            android:value="53e30583fd98c539e202401b" />
+            android:value="5642ab6667e58ef74c004f88" />
         <meta-data
             android:name="com.baidu.lbsapi.API_KEY"
             android:value="GY9wDXahmwI4BvbPgcrEeZ6C" />
